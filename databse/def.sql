@@ -1,0 +1,11 @@
+CREATE TABLE accounts (
+  userId INT PRIMARY KEY AUTO_INCREMENT,
+  userName VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  avatar VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  phone VARCHAR(255) NOT NULL,
+  born_date DATE NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  life_motto VARCHAR(255) NOT NULL
+);
