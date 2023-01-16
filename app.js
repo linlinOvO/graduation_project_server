@@ -48,7 +48,7 @@ pool.getConnection((err, connection) => {
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use("/api/v1/users", getUsersRouter)
-app.use("/login", getAccountRouter)
+app.use("/api/v1/login", getAccountRouter)
 
 
 // catch 404 and forward to error handler
