@@ -24,7 +24,7 @@ router.post('', function(req, res, next) {
                     } else {
                         console.log(results)
                         res.send(
-                            JSON.stringify({message:"success", user:results[0]})
+                            JSON.stringify(results[0])
                         )
                     }
                 });
