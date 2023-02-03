@@ -5,14 +5,16 @@ INSERT INTO accounts (userName, password, avatar, email, phone, born_date, descr
 ('mike', 'asdf', 'avatar4.jpg', 'mike@gmail.com', '123-456-7893', '1995-07-10', 'lawyer', 'The only way to do great work is to love what you do'),
 ('sarah', 'zxcvbnm', 'avatar5.jpg', 'sarah@gmail.com', '123-456-7894', '1994-09-01', 'artist', 'Create the life you want to live');
 
-INSERT INTO categories (userId, categoryName) VALUES
+INSERT INTO categories (userId, categoryName)
+VALUES
 (1, 'Category 1'), (1, 'Category 2'), (1, 'Category 3'), (1, 'Category 4'), (1, 'Category 5'),
 (2, 'Category 1'), (2, 'Category 2'), (2, 'Category 3'), (2, 'Category 4'), (2, 'Category 5');
 
-INSERT INTO questionAnswers (userId, categoryId, question, answer, QARank) VALUES
-                                                                               (1, 0, 'question for user1_0_1', 'answer for user1_0_1', 60.25),
-                                                                               (1, 0, 'question for user1_0_2', 'answer for user1_0_2', 75.84),
-                                                                               (1, 0, 'question for user1_0_3', 'answer for user1_0_3', 42.20),
+INSERT INTO questionAnswers (userId, categoryId, question, answer, QARank)
+VALUES
+    (1, 0, 'question for user1_0_1', 'answer for user1_0_1', 60.25),
+    (1, 0, 'question for user1_0_2', 'answer for user1_0_2', 75.84),
+    (1, 0, 'question for user1_0_3', 'answer for user1_0_3', 42.20),
                                                                                (1, 0, 'question for user1_0_4', 'answer for user1_0_4', 99.20),
                                                                                (1, 0, 'question for user1_0_5', 'answer for user1_0_5', 85.63),
                                                                                (1, 1, 'question for user1_1_1', 'answer for user1_1_1', 21.33),
@@ -60,3 +62,12 @@ INSERT INTO questionAnswers (userId, categoryId, question, answer, QARank) VALUE
                                                                                (2, 9, 'question for user2_9_3', 'answer for user2_9_3', 8.91),
                                                                                (2, 9, 'question for user2_9_4', 'answer for user2_9_4', 9.63),
                                                                                (2, 9, 'question for user2_9_5', 'answer for user2_9_5', 52.62);
+
+INSERT INTO check_ins (userId, checkInDate)
+VALUES
+    (1, '2023-01-30'),
+    (1, '2023-02-01'),
+    (1, '2023-02-02'),
+    (1, '2023-03-03'),
+    (1, '2023-03-02'),
+    (1, '2023-01-29');
