@@ -10,6 +10,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const getUsersRouter = require('./routes/user/getUsers')
 const getAccountRouter = require('./routes/login/login')
+const getCategoryForTodayRouter = require('./routes/category/getCategoryForToday')
 
 var app = express();
 
@@ -49,6 +50,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use("/api/v1/users", getUsersRouter)
 app.use("/api/v1/login", getAccountRouter)
+app.use("/api/v1/category/today", getCategoryForTodayRouter)
 
 
 // catch 404 and forward to error handler
