@@ -31,5 +31,9 @@ CREATE TABLE questionAnswers
 CREATE TABLE check_ins
 (
     userId INT NOT NULL,
-    checkInDate DATE NOT NULL
+    checkInDate DATE NOT NULL,
+    rememberWell INT,
+    remember INT,
+    familiar INT,
+    forgot INT
 );

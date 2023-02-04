@@ -63,11 +63,9 @@ VALUES
                                                                                (2, 9, 'question for user2_9_4', 'answer for user2_9_4', 9.63),
                                                                                (2, 9, 'question for user2_9_5', 'answer for user2_9_5', 52.62);
 
-INSERT INTO check_ins (userId, checkInDate)
+INSERT INTO check_ins (userId, checkInDate, rememberWell, remember, familiar, forgot)
 VALUES
-    (1, '2023-01-30'),
-    (1, '2023-02-01'),
-    (1, '2023-02-02'),
-    (1, '2023-03-03'),
-    (1, '2023-03-02'),
-    (1, '2023-01-29');
+    (1, '2023-02-01', 13, 23, 5, 0),
+    (1, '2023-02-02', 2, 43, 15, 60),
+    (1, '2023-01-31', 23, 14, 45, 2),
+    (1, '2023-01-29', 0, 3, 0, 6);
