@@ -37,3 +37,33 @@ CREATE TABLE check_ins
     familiar INT,
     forgot INT
 );
+
+CREATE TABLE store
+(
+    productId INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT NOT NULL,
+    title VARCHAR(50) NOT NULL,
+    productDescription TEXT NOT NULL,
+    likeAmount INT NOT NULL,
+    commentAmount INT NOT NULL,
+    downloadAmount INT NOT NULL
+);
+
+CREATE TABLE product_comments
+(
+    commentId INT AUTO_INCREMENT PRIMARY KEY,
+    productId INT NOT NULL,
+    content TEXT
+);
+
+CREATE TABLE product_questions
+(
+    productId INT NOT NULL,
+    QAId INT NOT NULL
+);
+
+CREATE TABLE product_like
+(
+    productId INT NOT NULL,
+    userId INT NOT NULL
+);

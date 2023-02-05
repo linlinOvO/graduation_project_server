@@ -69,3 +69,36 @@ VALUES
     (1, '2023-02-02', 2, 43, 15, 60),
     (1, '2023-01-31', 23, 14, 45, 2),
     (1, '2023-01-29', 0, 3, 0, 6);
+
+
+INSERT INTO store (userId, title, productDescription, likeAmount, commentAmount, downloadAmount)
+VALUES
+    (1, 'Product 1', 'Product Description 1', 6, 4, 20),
+    (1, 'Product 2', 'Product Description 2', 20, 5, 20),
+    (1, 'Product 3', 'Product Description 3', 100, 5, 20),
+    (1, 'Product 4', 'Product Description 4', 0, 5, 20);
+
+INSERT INTO product_comments (productId, content)
+VALUES
+    (1, 'Comment 1'),
+    (1, 'Comment 2'),
+    (1, 'Comment 3'),
+    (1, 'Comment 4');
+
+INSERT INTO product_questions (productId, QAId)
+VALUES
+    (1, 1),
+    (1, 2),
+    (1, 3),
+    (1, 4),
+    (1, 5),
+    (1, 6);
+
+INSERT INTO product_like (productId, userId)
+VALUES
+    (1, 1),
+    (1, 2),
+    (1, 3),
+    (1, 4),
+    (1, 5),
+    (1, 6);

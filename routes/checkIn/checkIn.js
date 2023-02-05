@@ -2,11 +2,9 @@ var express = require('express');
 var router = express.Router();
 const pool = require('../database')
 
-
 router.get('/:userId/:beginDate/:endDate', function(req, res) {
 
     const {userId, beginDate, endDate} = req.params
-    // console.log(userId, checkInDate)
 
     const calendarTemp = {
         preMonth: [],

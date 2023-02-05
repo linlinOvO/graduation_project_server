@@ -13,6 +13,7 @@ const getUsersRouter = require('./routes/user/getUsers')
 
 const loginRouter = require('./routes/login/login')
 const categoryRouter = require('./routes/category/category')
+const QARouter = require('./routes/questionAnswer/questionAnswer')
 const checkInRouter = require('./routes/checkIn/checkIn')
 
 
@@ -39,10 +40,6 @@ pool.getConnection((err, connection) => {
       if (error) {
         // handle error
         console.error(error);
-      } else {
-        if(results.length === 5){
-          console.log("connect mysql successfully");
-        }
       }
     });
   }
@@ -56,8 +53,9 @@ app.use("/api/v1/users", getUsersRouter)
 
 
 app.use("/api/v1/login", loginRouter)
-app.use("/api/v1/category", categoryRouter)
 app.use("/api/v1/check_in", checkInRouter)
+app.use("/api/v1/category", categoryRouter)
+app.use("/api/v1/q_a", QARouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
