@@ -82,10 +82,11 @@ router.get('/:userId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT rememberIt.questionAnswers.*, rememberIt.categories.categoryName \n" +
-                "FROM rememberIt.questionAnswers \n" +
-                "JOIN rememberIt.categories ON rememberIt.categories.categoryId = rememberIt.questionAnswers.categoryId \n" +
-                "WHERE rememberIt.questionAnswers.userId = ?;",
+            connection.query("SELECT c.*, qa.question, qa.answer, qa.QARank, qa.QAId\n" +
+                "FROM rememberIt.categories c\n" +
+                "LEFT JOIN rememberIt.questionAnswers qa\n" +
+                "ON c.categoryId = qa.categoryId AND qa.userId = 1\n" +
+                "WHERE c.userId = ?;\n",
                 [userId],
                 (error, results) => {
                     connection.release();
@@ -123,18 +124,18 @@ router.post('', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.categories (userId, categoryName)VALUES (?, ?);",
-                [userId, categoryName],
-                (error) => {
-                    // console.log(results)
+            connection.query("INSERT INTO rememberIt.categories (userId, categoryName)VALUES (?, ?); SELECT categoryId FROM rememberIt.categories WHERE userId = ? AND categoryName = ?;",
+                [userId, categoryName, userId, categoryName],
+                (error, results) => {
+                    // console.log(results[1][0].categoryId)
                     connection.release();
                     if (error) {
                         res.send(
-                            JSON.stringify({message: error})
+                            JSON.stringify({message: error, newCategoryId: -1})
                         )
                     } else {
                         res.send(
-                            JSON.stringify({message: "success"})
+                            JSON.stringify({message: "success", newCategoryId: results[1][0].categoryId})
                         )
                     }
                 });
@@ -172,7 +173,7 @@ router.delete('/:categoryId', function (req, res){
 
 router.put('', function (req, res){
     const {categoryId, categoryName} = req.body
-    // console.log(userId, checkInDate)
+    console.log(categoryId, categoryName)
 
     pool.getConnection((err, connection) => {
         if (err) {
@@ -201,11 +202,14 @@ router.put('', function (req, res){
 function transformList(list) {
     const QAsTemp = [];
     list.forEach(item => {
+        // console.log(item)
+        // console.log(item.categoryId)
         const foundIndex = QAsTemp.findIndex(tempItem => tempItem.categoryId === item.categoryId);
         if (foundIndex === -1) {
+            // console.log("new: "+item.categoryName)
             QAsTemp.push({
                 categoryName: item.categoryName,
-                QAs: [{
+                QAs: item.question === null ? []: [{
                     question: item.question,
                     answer: item.answer,
                     QAId: item.QAId,
@@ -216,6 +220,7 @@ function transformList(list) {
                 categoryId: item.categoryId
             });
         } else {
+            // console.log(item.userId)
             QAsTemp[foundIndex].QAs.push({
                 question: item.question,
                 answer: item.answer,
