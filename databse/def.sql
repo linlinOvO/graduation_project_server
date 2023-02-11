@@ -1,7 +1,7 @@
 CREATE TABLE accounts
 (
     userId      INT PRIMARY KEY AUTO_INCREMENT,
-    userName    VARCHAR(255) NOT NULL,
+    username    VARCHAR(255) NOT NULL,
     password    VARCHAR(255) NOT NULL,
     avatar      VARCHAR(255) NOT NULL,
     email       VARCHAR(255) NOT NULL,
@@ -46,13 +46,15 @@ CREATE TABLE store
     productDescription TEXT NOT NULL,
     likeAmount INT NOT NULL,
     commentAmount INT NOT NULL,
-    downloadAmount INT NOT NULL
+    downloadAmount INT NOT NULL,
+    releaseDate DATE NOT NULL
 );
 
 CREATE TABLE product_comments
 (
     commentId INT AUTO_INCREMENT PRIMARY KEY,
     productId INT NOT NULL,
+    userId INT NOT NULL,
     content TEXT
 );
 

@@ -7,7 +7,7 @@ router.get('/today/:userId', function(req, res) {
     const userId = req.params.userId
     console.log(userId)
 
-    const QAsTemp = [{
+    const categoriesTemp = [{
         categoryName: "",
         QAs: [{
             question: "",
@@ -39,13 +39,13 @@ router.get('/today/:userId', function(req, res) {
                         // console.error(error);
                         // console.log(JSON.stringify({message: error, categories: QAsTemp}) )
                         res.send(
-                            JSON.stringify({message: error, categories: QAsTemp})
+                            JSON.stringify({message: error, categories: categoriesTemp})
                         )
                     } else {
                         if(results.length === 0){
                             // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
                             res.send(
-                                JSON.stringify({message: "No QA for today", categories: QAsTemp})
+                                JSON.stringify({message: "No QA for today", categories: categoriesTemp})
                             )
                         }else{
                             // console.log(JSON.stringify({message: "success", categories: results}))
@@ -82,11 +82,7 @@ router.get('/:userId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT c.*, qa.question, qa.answer, qa.QARank, qa.QAId\n" +
-                "FROM rememberIt.categories c\n" +
-                "LEFT JOIN rememberIt.questionAnswers qa\n" +
-                "ON c.categoryId = qa.categoryId AND qa.userId = 1\n" +
-                "WHERE c.userId = ?;\n",
+            connection.query("SELECT c.*, qa.question, qa.answer, qa.QARank, qa.QAId FROM rememberIt.categories c LEFT JOIN rememberIt.questionAnswers qa ON c.categoryId = qa.categoryId AND qa.userId = c.userId WHERE c.userId = ? ORDER BY categoryId, qa.QAId;",
                 [userId],
                 (error, results) => {
                     connection.release();
@@ -205,8 +201,8 @@ function transformList(list) {
         // console.log(item)
         // console.log(item.categoryId)
         const foundIndex = QAsTemp.findIndex(tempItem => tempItem.categoryId === item.categoryId);
+        // console.log(item)
         if (foundIndex === -1) {
-            // console.log("new: "+item.categoryName)
             QAsTemp.push({
                 categoryName: item.categoryName,
                 QAs: item.question === null ? []: [{

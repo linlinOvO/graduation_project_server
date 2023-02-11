@@ -15,6 +15,7 @@ const loginRouter = require('./routes/login/login')
 const categoryRouter = require('./routes/category/category')
 const QARouter = require('./routes/questionAnswer/questionAnswer')
 const checkInRouter = require('./routes/checkIn/checkIn')
+const storeRouter = require('./routes/store/store')
 
 
 const app = express();
@@ -35,7 +36,7 @@ pool.getConnection((err, connection) => {
     // handle error
     console.error(err);
   } else {
-    connection.query('SELECT * FROM RememberIt.accounts', (error, results) => {
+    connection.query('SELECT * FROM RememberIt.accounts', (error) => {
       connection.release();
       if (error) {
         // handle error
@@ -56,6 +57,7 @@ app.use("/api/v1/login", loginRouter)
 app.use("/api/v1/check_in", checkInRouter)
 app.use("/api/v1/category", categoryRouter)
 app.use("/api/v1/q_a", QARouter)
+app.use("/api/v1/store", storeRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

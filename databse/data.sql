@@ -1,4 +1,4 @@
-INSERT INTO accounts (userName, password, avatar, email, phone, born_date, description, life_motto) VALUES
+INSERT INTO accounts (username, password, avatar, email, phone, born_date, description, life_motto) VALUES
 ('jane', 'mypassword', 'avatar.jpg', 'jane@gmail.com', '123-456-7890', '2000-01-01', 'software engineer', 'Work hard, play hard'),
 ('john', 'password123', 'avatar2.jpg', 'john@gmail.com', '123-456-7891', '1998-02-14', 'teacher', 'Life is too short to be anything but happy'),
 ('maria', 'qwerty', 'avatar3.jpg', 'maria@gmail.com', '123-456-7892', '1996-05-20', 'doctor', 'Carpe diem'),
@@ -71,19 +71,19 @@ VALUES
     (1, '2023-01-29', 0, 3, 0, 6);
 
 
-INSERT INTO store (userId, title, productDescription, likeAmount, commentAmount, downloadAmount)
+INSERT INTO store (userId, title, productDescription, likeAmount, commentAmount, downloadAmount, releaseDate)
 VALUES
-    (1, 'Product 1', 'Product Description 1', 6, 4, 20),
-    (1, 'Product 2', 'Product Description 2', 20, 5, 20),
-    (1, 'Product 3', 'Product Description 3', 100, 5, 20),
-    (1, 'Product 4', 'Product Description 4', 0, 5, 20);
+    (1, 'Product 1', 'Product Description 1', 6, 4, 20, "2023-2-1"),
+    (1, 'Product 2', 'Product Description 2', 20, 5, 20, "2023-2-1"),
+    (1, 'Product 3', 'Product Description 3', 100, 5, 20, "2023-2-1"),
+    (1, 'Product 4', 'Product Description 4', 0, 5, 20, "2023-2-1");
 
-INSERT INTO product_comments (productId, content)
+INSERT INTO product_comments (productId, userId, content)
 VALUES
-    (1, 'Comment 1'),
-    (1, 'Comment 2'),
-    (1, 'Comment 3'),
-    (1, 'Comment 4');
+    (1, 2, 'Comment 1'),
+    (1, 2, 'Comment 2'),
+    (1, 2, 'Comment 3'),
+    (1, 2, 'Comment 4');
 
 INSERT INTO product_questions (productId, QAId)
 VALUES
