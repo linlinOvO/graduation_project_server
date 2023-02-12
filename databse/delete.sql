@@ -1,10 +1,8 @@
-
 DROP TABLE questionAnswers;
 DROP TABLE categories;
+DROP TABLE checkIns;
+DROP TABLE productQA;
+DROP TABLE productComments;
+DROP TABLE productLike;
+DROP TABLE products;
 DROP TABLE accounts;
-DROP TABLE check_ins;
-
-DROP TABLE store;
-DROP TABLE product_comments;
-DROP TABLE product_questions;
-DROP TABLE product_like;
