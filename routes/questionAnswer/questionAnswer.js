@@ -95,15 +95,15 @@ router.get('/:QAId', function(req, res) {
 });
 
 router.post('', function (req, res){
-    const { userId, categoryId, question, answer, QARank } = req.body
+    const { userId, categoryId, QAType, question, answer, QARank } = req.body
 
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.questionAnswers (userId, categoryId, question, answer, QARank)VALUES (?, ?, ?, ?, ?); SELECT QAId FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? AND question = ? AND answer = ? AND QARank = ?;",
-                [userId, categoryId, question, answer, QARank, userId, categoryId, question, answer, QARank],
+            connection.query("INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank)VALUES (?, ?, ?, ?, ?, ?); SELECT QAId FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? AND question = ? AND answer = ? AND QARank = ?;",
+                [userId, categoryId, QAType, question, answer, QARank, userId, categoryId, question, answer, QARank],
                 (error, results) => {
                     // console.log(results)
                     connection.release();

@@ -14,9 +14,9 @@ router.post('/login', function(req, res, next) {
         avatar: "",
         email: "",
         phone: "",
-        born_date: "",
+        bornDate: "",
         description: "",
-        life_motto: "",
+        lifeMotto: "",
     }
 
     pool.getConnection((err, connection) => {
@@ -61,7 +61,7 @@ router.post('/logUp', function(req, res, next) {
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.accounts (username, password, avatar, email, phone, born_date, description, life_motto)VALUES (?, ?, 'avatar', ?, ?, ?, ?, ?);",
+            connection.query("INSERT INTO rememberIt.accounts (username, password, avatar, email, phone, bornDate, description, lifeMotto)VALUES (?, ?, 'avatar', ?, ?, ?, ?, ?);",
                 [username, password, email, phone, bornDate, description, lifeMotto],
                 (error) => {
                     connection.release();

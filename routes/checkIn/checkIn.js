@@ -50,7 +50,7 @@ router.get('/:userId/:beginDate/:endDate', function(req, res) {
             console.error(err);
         } else {
             connection.query("SELECT checkInDate\n" +
-                "FROM rememberIt.check_ins\n" +
+                "FROM rememberIt.checkIns\n" +
                 "WHERE userId = ? AND checkInDate BETWEEN ? AND ?;\n",
                 [userId, beginDate, endDate],
                 (error, results) => {
@@ -87,7 +87,7 @@ router.get('/:userId/:checkInDate', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT rememberWell, remember, familiar, forgot FROM rememberIt.check_ins WHERE userId = ? AND checkInDate = ?;",
+            connection.query("SELECT rememberWell, remember, familiar, forgot FROM rememberIt.checkIns WHERE userId = ? AND checkInDate = ?;",
                 [userId, checkInDate],
                 (error, results) => {
                     // console.log(results)
@@ -116,7 +116,7 @@ router.post('', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.check_ins (userId, checkInDate, rememberWell, remember, familiar, forgot)VALUES (?, ?, ?, ?, ?, ?);",
+            connection.query("INSERT INTO rememberIt.checkIns (userId, checkInDate, rememberWell, remember, familiar, forgot)VALUES (?, ?, ?, ?, ?, ?);",
                 [userId, checkInDate, rememberWell, remember, familiar, forgot],
                 (error) => {
                 // console.log(results)

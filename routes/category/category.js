@@ -12,9 +12,8 @@ router.get('/today/:userId', function(req, res) {
         QAs: [{
             question: "",
             answer: "",
+            QAType: "",
             QAId: -1,
-            userId: -1,
-            categoryId: -1,
             QARank: -1.00
         }],
         categoryId: -1
@@ -69,9 +68,8 @@ router.get('/:userId', function(req, res) {
         QAs: [{
             question: "",
             answer: "",
+            QAType: "",
             QAId: -1,
-            userId: -1,
-            categoryId: -1,
             QARank: -1.00
         }],
         categoryId: -1
@@ -82,7 +80,7 @@ router.get('/:userId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT c.*, qa.question, qa.answer, qa.QARank, qa.QAId FROM rememberIt.categories c LEFT JOIN rememberIt.questionAnswers qa ON c.categoryId = qa.categoryId AND qa.userId = c.userId WHERE c.userId = ? ORDER BY categoryId, qa.QAId;",
+            connection.query("SELECT c.*, qa.question, qa.answer, qa.QARank, qa.QAId, qa.QAType FROM rememberIt.categories c LEFT JOIN rememberIt.questionAnswers qa ON c.categoryId = qa.categoryId AND qa.userId = c.userId WHERE c.userId = ? ORDER BY categoryId, qa.QAId;",
                 [userId],
                 (error, results) => {
                     connection.release();
@@ -148,8 +146,8 @@ router.delete('/:categoryId', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query("DELETE FROM rememberIt.categories WHERE categoryId = ?;",
-                [categoryId],
+            connection.query("DELETE FROM rememberIt.questionAnswers WHERE categoryId = ?; DELETE FROM rememberIt.categories WHERE categoryId = ?;",
+                [categoryId, categoryId],
                 (error) => {
                     // console.log(results)
                     connection.release();
@@ -208,9 +206,8 @@ function transformList(list) {
                 QAs: item.question === null ? []: [{
                     question: item.question,
                     answer: item.answer,
+                    QAType: item.QAType,
                     QAId: item.QAId,
-                    userId: item.userId,
-                    categoryId: item.categoryId,
                     QARank: item.QARank
                 }],
                 categoryId: item.categoryId
@@ -220,9 +217,8 @@ function transformList(list) {
             QAsTemp[foundIndex].QAs.push({
                 question: item.question,
                 answer: item.answer,
+                QAType: item.QAType,
                 QAId: item.QAId,
-                userId: item.userId,
-                categoryId: item.categoryId,
                 QARank: item.QARank
             });
         }

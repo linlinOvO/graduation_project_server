@@ -32,16 +32,19 @@ router.get('', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT rememberIt.store.*, rememberIt.accounts.userName, rememberIt.accounts.avatar, rememberIt.accounts.description, rememberIt.accounts.life_motto, sub_qa.QAId, sub_qa.categoryId, sub_qa.question, sub_qa.answer, sub_qa.QARank \n" +
-                "FROM rememberIt.store\n" +
-                "LEFT JOIN rememberIt.accounts ON rememberIt.store.userId = rememberIt.accounts.userId\n" +
-                "LEFT JOIN (\n" +
-                "  SELECT rememberIt.product_questions.productId, rememberIt.questionAnswers.QAId, rememberIt.questionAnswers.categoryId, rememberIt.questionAnswers.question, rememberIt.questionAnswers.answer, rememberIt.questionAnswers.QARank\n" +
-                "  FROM rememberIt.product_questions\n" +
-                "  JOIN rememberIt.questionAnswers ON rememberIt.product_questions.QAId = rememberIt.questionAnswers.QAId\n" +
-                "  ORDER BY rememberIt.product_questions.productId, rememberIt.questionAnswers.QARank\n" +
-                "  LIMIT 5\n" +
-                ") AS sub_qa ON rememberIt.store.productId = sub_qa.productId;\n",
+            connection.query("SELECT \n" +
+                "    p.*, \n" +
+                "    a.username, \n" +
+                "    a.avatar, \n" +
+                "    a.description, \n" +
+                "    a.lifeMotto, \n" +
+                "    qa.productQAId, \n" +
+                "    qa.QAType, \n" +
+                "    qa.question, \n" +
+                "    qa.answer \n" +
+                "FROM rememberIt.products p\n" +
+                "INNER JOIN rememberIt.accounts a ON p.userId = a.userId \n" +
+                "INNER JOIN rememberIt.productQAs qa ON p.productId = qa.productId;",
                 [],
                 (error, results) => {
                     connection.release();
@@ -78,7 +81,6 @@ function formatDate(dateStr) {
     return `${year}-${month}-${day}`;
 }
 
-
 function transformList(list) {
     const productsTemp = [];
     list.forEach(item => {
@@ -89,14 +91,19 @@ function transformList(list) {
         if (foundIndex === -1) {
             productsTemp.push({
                 userId: item.userId,
-                username: item.userName,
+                username: item.username,
                 avatar: item.avatar,
                 description: item.description,
-                lifeMotto: item.life_motto,
+                lifeMotto: item.lifeMotto,
                 title: item.title,
                 productDescription: item.productDescription,
                 productId: item.productId,
-                QAs: [],
+                QAs: [{
+                    question: item.question,
+                    answer: item.answer,
+                    productQAId: item.productQAId,
+                    QAType: item.QAType,
+                }],
                 likeAmount: item.likeAmount,
                 commentAmount: item.commentAmount,
                 downloadAmount: item.downloadAmount,
@@ -107,67 +114,14 @@ function transformList(list) {
             productsTemp[foundIndex].QAs.push({
                 question: item.question,
                 answer: item.answer,
-                QAId: item.QAId,
-                userId: item.userId,
-                categoryId: item.categoryId,
-                QARank: item.QARank
+                productQAId: item.productQAId,
+                QAType: item.QAType,
             });
         }
     });
     return productsTemp.sort((a, b) => a.productId - b.productId);
 }
 
-router.get('/:productId', function(req, res) {
-
-    const { productId } = req.params
-    console.log(productId)
-
-    const productTemp = {
-        productId: -1,
-        userId: -1,
-        title: "",
-        productDescription: "",
-        likeAmount: -1,
-        commentAmount: -1,
-        downloadAmount: -1,
-        userName: "",
-        avatar: "",
-        userDescription: "",
-        releaseDate: ""
-    }
-
-    pool.getConnection((err, connection) => {
-        if (err) {
-            // handle error
-            console.error(err);
-        } else {
-            connection.query("SELECT rememberIt.store.*, rememberIt.accounts.userName, rememberIt.accounts.avatar, rememberIt.accounts.description\n" +
-                "FROM rememberIt.store\n" +
-                "JOIN rememberIt.accounts ON rememberIt.store.userId = rememberIt.accounts.userId\n" +
-                "WHERE productId = ?;",
-                [productId],
-                (error, results) => {
-                    connection.release();
-                    if (error) {
-                        res.send(
-                            JSON.stringify({message: error, QA: QATemp})
-                        )
-                    } else {
-                        if(results.length === 0){
-                            res.send(
-                                JSON.stringify({message: "can not find QA", QA: QATemp})
-                            )
-                        }else{
-                            // console.log(JSON.stringify({message: "success", categories: results}))
-                            res.send(
-                                JSON.stringify({message: "success", QA: results[0]})
-                            )
-                        }
-                    }
-                });
-        }
-    });
-});
 
 router.get('/like/:userId', function(req, res) {
 
@@ -180,7 +134,7 @@ router.get('/like/:userId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT productId FROM rememberIt.product_like WHERE userId = ?;",
+            connection.query("SELECT productId FROM rememberIt.productLikes WHERE userId = ?;",
                 [userId],
                 (error, results) => {
                     connection.release();
@@ -229,11 +183,11 @@ router.get('/comment/:productId', function (req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT rememberIt.product_comments.commentId, rememberIt.product_comments.content, rememberIt.accounts.username\n" +
-                "FROM rememberIt.product_comments\n" +
-                "JOIN rememberIt.accounts\n" +
-                "ON rememberIt.product_comments.userId = rememberIt.accounts.userId\n" +
-                "WHERE rememberIt.product_comments.productId = ?;\n",
+            connection.query("SELECT c.commentId, c.content, a.username\n" +
+                "FROM rememberIt.productComments c\n" +
+                "JOIN rememberIt.accounts a\n" +
+                "ON c.userId = a.userId\n" +
+                "WHERE c.productId = 1;",
                 [productId],
                 (error, results) => {
                     connection.release();
@@ -267,7 +221,7 @@ router.post('/like', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.product_like (productId, userId)VALUES (?, ?);",
+            connection.query("INSERT INTO rememberIt.productLikes (productId, userId)VALUES (?, ?);",
                 [productId, userId],
                 (error) => {
                     // console.log(results)
@@ -294,7 +248,7 @@ router.post('/comment', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.product_comments (productId, userId, content)VALUES (?, ?, ?); SELECT commentId FROM rememberIt.product_comments WHERE productId = ? AND userId = ? AND content = ? ORDER BY commentId DESC LIMIT 1;",
+            connection.query("INSERT INTO rememberIt.productComments (productId, userId, content)VALUES (?, ?, ?); SELECT commentId FROM rememberIt.productComments WHERE productId = ? AND userId = ? AND content = ? ORDER BY commentId DESC LIMIT 1;",
                 [productId, userId, content, productId, userId, content],
                 (error, results) => {
                     // console.log(results)
@@ -322,7 +276,7 @@ router.delete('/like/:userId/:productId', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query("DELETE FROM rememberIt.product_like WHERE productId = ? and userId = ?;",
+            connection.query("DELETE FROM rememberIt.productLikes WHERE productId = ? and userId = ?;",
                 [productId, userId],
                 (error) => {
                     // console.log(results)

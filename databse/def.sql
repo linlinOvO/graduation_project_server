@@ -60,7 +60,7 @@ CREATE TABLE products
     FOREIGN KEY        (userId) REFERENCES accounts(userId)
 );
 
-CREATE TABLE productQA
+CREATE TABLE productQAs
 (
     productQAId        INT AUTO_INCREMENT,
     productId   INT,
@@ -82,7 +82,7 @@ CREATE TABLE productComments
     FOREIGN KEY (productId) REFERENCES products(productId)
 );
 
-CREATE TABLE productLike
+CREATE TABLE productLikes
 (
     productId   INT NOT NULL,
     userId      INT NOT NULL,

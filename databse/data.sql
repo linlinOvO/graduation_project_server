@@ -78,7 +78,7 @@ VALUES
     (1, 'Product 3', 'Product Description 3', 100, 5, 20, "2023-2-1"),
     (1, 'Product 4', 'Product Description 4', 0, 5, 20, "2023-2-1");
 
-INSERT INTO productQA (productId, QAType, question, answer)
+INSERT INTO productQAs (productId, QAType, question, answer)
 VALUES
     (1, 'CLICK_TYPE', 'question for product1_1', 'answer for product1_1'),
     (1, 'CLICK_TYPE', 'question for product1_2', 'answer for product1_2'),
@@ -98,7 +98,7 @@ VALUES
     (2, 2, 'Comment 3'),
     (1, 2, 'Comment 4');
 
-INSERT INTO productLike (productId, userId)
+INSERT INTO productLikes (productId, userId)
 VALUES
     (1, 1),
     (1, 2);

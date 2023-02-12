@@ -3,5 +3,6 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/databse/data.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/databse/def.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/databse/delete.sql" dialect="GenericSQL" />
   </component>
 </project>
