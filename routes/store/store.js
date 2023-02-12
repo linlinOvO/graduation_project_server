@@ -312,6 +312,7 @@ router.post('/comment', function (req, res){
         }
     });
 })
+
 router.delete('/like/:userId/:productId', function (req, res){
     const { userId, productId } = req.params
     // console.log(userId, checkInDate)

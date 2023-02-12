@@ -28,7 +28,7 @@ CREATE TABLE questionAnswers
     QARank     DECIMAL(4, 2)
 );
 
-CREATE TABLE check_ins
+CREATE TABLE checkIns
 (
     userId INT NOT NULL,
     checkInDate DATE NOT NULL,
@@ -50,7 +50,15 @@ CREATE TABLE store
     releaseDate DATE NOT NULL
 );
 
-CREATE TABLE product_comments
+CREATE TABLE productsQA
+(
+    QAId     INT PRIMARY KEY AUTO_INCREMENT,
+    productId INT,
+    question TEXT,
+    answer   TEXT,
+)
+
+CREATE TABLE productComments
 (
     commentId INT AUTO_INCREMENT PRIMARY KEY,
     productId INT NOT NULL,
@@ -58,13 +66,13 @@ CREATE TABLE product_comments
     content TEXT
 );
 
-CREATE TABLE product_questions
+CREATE TABLE productQuestions
 (
     productId INT NOT NULL,
     QAId INT NOT NULL
 );
 
-CREATE TABLE product_like
+CREATE TABLE productLike
 (
     productId INT NOT NULL,
     userId INT NOT NULL
