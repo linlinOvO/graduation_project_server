@@ -13,6 +13,7 @@ const getUsersRouter = require('./routes/user/getUsers')
 
 // const loginRouter = require('./routes/account/login')
 const categoryRouter = require('./routes/category/category')
+const statisticRouter = require('./routes/statistic/statistic')
 const QARouter = require('./routes/questionAnswer/questionAnswer')
 const checkInRouter = require('./routes/checkIn/checkIn')
 const storeRouter = require('./routes/store/store')
@@ -60,6 +61,7 @@ app.use("/api/v1/category", categoryRouter)
 app.use("/api/v1/q_a", QARouter)
 app.use("/api/v1/store", storeRouter)
 app.use("/api/v1/account", accountRouter)
+app.use("/api/v1/statistic", statisticRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

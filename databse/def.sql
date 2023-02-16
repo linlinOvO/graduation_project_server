@@ -26,7 +26,7 @@ CREATE TABLE questionAnswers
     QAId         INT AUTO_INCREMENT,
     userId       INT,
     categoryId   INT,
-    QAType       VARCHAR(10),
+    QAType       VARCHAR(20),
     question     TEXT,
     answer       TEXT,
     QARank       DECIMAL(4, 2),
@@ -88,4 +88,25 @@ CREATE TABLE productLikes
     userId      INT NOT NULL,
     FOREIGN KEY (userId) REFERENCES accounts(userId),
     FOREIGN KEY (productId) REFERENCES products(productId)
+);
+
+CREATE TABLE memoryRecord
+(
+    userId       INT NOT NULL,
+    checkInDate  DATE NOT NULL,
+    rememberWell INT,
+    remember     INT,
+    familiar     INT,
+    forgot       INT,
+    FOREIGN KEY  (userId) REFERENCES accounts(userId)
+);
+
+CREATE TABLE checkInRecord
+(
+    userId                 INT NOT NULL,
+    lastCheckIn            DATE NOT NULL,
+    continuallyCheckIn     INT NOT NULL,
+    totallyCheckIn         INT NOT NULL,
+    mostContinuallyCheckIn INT NOT NULL,
+    FOREIGN KEY            (userId) REFERENCES accounts(userId)
 );

@@ -41,6 +41,7 @@ router.post('/login', function(req, res, next) {
                                 JSON.stringify({message: "Incorrect username or password", user: userTemp})
                             )
                         }else{
+                            // console.log(results[0])
                             res.send(
                                 JSON.stringify({message: "success", user: results[0]})
                             )
