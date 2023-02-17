@@ -109,6 +109,50 @@ router.get('/:userId', function(req, res) {
     });
 });
 
+router.get('/brief/userId=:userId', function(req, res) {
+
+    const userId = req.params.userId
+    // console.log(userId)
+
+    const categoriesTemp = [{
+        categoryName: "",
+        categoryId: -1
+    }]
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            console.error(err);
+        } else {
+            connection.query("SELECT categoryName, categoryId FROM rememberIt.categories c WHERE c.userId = ?;",
+                [userId],
+                (error, results) => {
+                    connection.release();
+                    if (error) {
+                        // handle error
+                        // console.error(error);
+                        // console.log(JSON.stringify({message: error, categories: QAsTemp}) )
+                        res.send(
+                            JSON.stringify({message: error, categories: categoriesTemp})
+                        )
+                    } else {
+                        if(results.length === 0){
+                            // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
+                            res.send(
+                                JSON.stringify({message: "No QA", categories: categoriesTemp})
+                            )
+                        }else{
+                            // console.log(JSON.stringify({message: "success", categories: results}))
+                            res.send(
+                                JSON.stringify({message: "success", categories: results})
+                            )
+                        }
+                    }
+                });
+        }
+    });
+});
+
 router.post('', function (req, res){
     const {userId, categoryName} = req.body
     // console.log(userId, checkInDate)

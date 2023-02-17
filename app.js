@@ -63,6 +63,12 @@ app.use("/api/v1/store", storeRouter)
 app.use("/api/v1/account", accountRouter)
 app.use("/api/v1/statistic", statisticRouter)
 
+app.all('*', function(req, res, next) {
+  setTimeout(function() {
+    next();
+  }, 120000); // 120 seconds
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
