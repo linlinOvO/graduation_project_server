@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const pool = require('../database')
 
-router.get('/checkInDate/:userId/:beginDate/:endDate', function(req, res) {
+router.get('/calendar/userId=:userId/beginDate=:beginDate/endDate=:endDate', function(req, res) {
 
     const {userId, beginDate, endDate} = req.params
 
@@ -70,7 +70,7 @@ router.get('/checkInDate/:userId/:beginDate/:endDate', function(req, res) {
     });
 });
 
-router.get('/checkInDate/:userId/:checkInDate', function(req, res) {
+router.get('/record/userId=:userId/checkInDate=:checkInDate', function(req, res) {
 
     const {userId, checkInDate} = req.params
     console.log(userId, checkInDate)
@@ -106,7 +106,7 @@ router.get('/checkInDate/:userId/:checkInDate', function(req, res) {
     });
 });
 
-router.post('', function(req, res) {
+router.post('/record', function(req, res) {
 
     const {userId, checkInDate, rememberWell, remember, familiar, forgot} = req.body
     // console.log(userId, checkInDate)
@@ -134,7 +134,7 @@ router.post('', function(req, res) {
         }
     });
 });
-router.get('/record/:userId/', function(req, res) {
+router.get('/state/userId=:userId/', function(req, res) {
 
     const {userId} = req.params
 

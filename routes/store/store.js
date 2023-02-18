@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const pool = require('../database')
 
-router.get('', function(req, res) {
+router.get('/product', function(req, res) {
 
     const storeTemp = [{
         userId: -1,
@@ -123,7 +123,7 @@ function transformList(list) {
 }
 
 
-router.get('/like/:userId', function(req, res) {
+router.get('/like/userId=:userId', function(req, res) {
 
     const { userId } = req.params
 
@@ -267,7 +267,7 @@ router.post('/comment', function (req, res){
     });
 })
 
-router.delete('/like/:userId/:productId', function (req, res){
+router.delete('/like/userId=:userId/productId=:productId', function (req, res){
     const { userId, productId } = req.params
     // console.log(userId, checkInDate)
 

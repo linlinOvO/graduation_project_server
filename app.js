@@ -56,7 +56,7 @@ app.use("/api/v1/users", getUsersRouter)
 
 
 // app.use("/api/v1/login", loginRouter)
-app.use("/api/v1/check_in", checkInRouter)
+app.use("/api/v1/checkIn", checkInRouter)
 app.use("/api/v1/category", categoryRouter)
 app.use("/api/v1/q_a", QARouter)
 app.use("/api/v1/store", storeRouter)

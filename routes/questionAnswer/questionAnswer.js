@@ -121,7 +121,7 @@ router.post('', function (req, res){
     });
 })
 
-router.delete('/:QAId', function (req, res){
+router.delete('/QAId=:QAId', function (req, res){
     const { QAId } = req.params
     // console.log(userId, checkInDate)
 

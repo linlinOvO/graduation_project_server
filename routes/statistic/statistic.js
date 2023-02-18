@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const pool = require('../database')
 
-router.get('/studyRecord/:userId', function(req, res) {
+router.get('/studyRecord/userId=:userId', function(req, res) {
 
     const {userId} = req.params
     // console.log(11111)
@@ -71,7 +71,7 @@ router.get('/studyRecord/:userId', function(req, res) {
 });
 
 
-router.get('/memoryRecord/:userId', function(req, res) {
+router.get('/memoryRecord/userId=:userId', function(req, res) {
 
     const {userId} = req.params
     // console.log(11111)
