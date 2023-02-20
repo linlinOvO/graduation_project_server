@@ -70,7 +70,7 @@ router.get('/calendar/userId=:userId/beginDate=:beginDate/endDate=:endDate', fun
     });
 });
 
-router.get('/record/userId=:userId/checkInDate=:checkInDate', function(req, res) {
+router.get('/calendar/userId=:userId/checkInDate=:checkInDate', function(req, res) {
 
     const {userId, checkInDate} = req.params
     console.log(userId, checkInDate)
@@ -106,20 +106,44 @@ router.get('/record/userId=:userId/checkInDate=:checkInDate', function(req, res)
     });
 });
 
-router.post('/record', function(req, res) {
+router.post('/calendar', function(req, res) {
 
     const {userId, checkInDate, rememberWell, remember, familiar, forgot} = req.body
-    // console.log(userId, checkInDate)
+    console.log(rememberWell, remember, familiar, forgot)
 
+    let combinedQuery = ""
+
+    const loginQuery = `INSERT INTO rememberIt.checkIns (userId, checkInDate, rememberWell, remember, familiar, forgot)VALUES (?, ?, ?, ?, ?, ?);`
+    combinedQuery += loginQuery
+
+    if(rememberWell.length > 0){
+        const rememberWellIds = rememberWell.join(',');
+        const rememberWellQuery = `UPDATE rememberIt.questionAnswers SET QARank = 100 WHERE userId = ? AND QAId IN (${rememberWellIds});`;
+        combinedQuery += rememberWellQuery
+    }
+    if(remember.length > 0){
+        const rememberIds = remember.join(',');
+        const rememberQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 10 WHERE userId = ? AND QAId IN (${rememberIds});`;
+        combinedQuery += rememberQuery
+    }
+    if(familiar.length > 0){
+        const familiarIds = familiar.join(',');
+        const familiarQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 0 WHERE userId = ? AND QAId IN (${familiarIds});`;
+        combinedQuery += familiarQuery
+    }
+    if(forgot.length > 0){
+        const forgotIds = forgot.join(',');
+        const forgotQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank - 10 WHERE userId = ? AND QAId IN (${forgotIds})`;
+        combinedQuery += forgotQuery
+    }
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.checkIns (userId, checkInDate, rememberWell, remember, familiar, forgot)VALUES (?, ?, ?, ?, ?, ?);",
-                [userId, checkInDate, rememberWell, remember, familiar, forgot],
+            connection.query(combinedQuery,
+                [userId, checkInDate, rememberWell.length, remember.length, familiar.length, forgot.length, userId, userId, userId, userId],
                 (error) => {
-                // console.log(results)
                     connection.release();
                     if (error) {
                         res.send(
@@ -134,7 +158,7 @@ router.post('/record', function(req, res) {
         }
     });
 });
-router.get('/state/userId=:userId/', function(req, res) {
+router.get('/profile/userId=:userId/', function(req, res) {
 
     const {userId} = req.params
 
