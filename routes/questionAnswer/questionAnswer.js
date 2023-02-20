@@ -50,18 +50,17 @@ router.get('/:categoryId/:userId', function(req, res) {
     });
 });
 
-router.get('/:QAId', function(req, res) {
+router.get('/qAId=:qAId', function(req, res) {
 
-    const { QAId } = req.params
-    console.log(QAId)
+    const { qAId } = req.params
+    console.log(qAId)
 
     const QATemp = {
         question: "",
         answer: "",
         QAId: -1,
-        userId: -1,
-        categoryId: -1,
-        QARank: -1.00
+        QARank: -1.00,
+        QAType: ""
     }
 
     pool.getConnection((err, connection) => {
@@ -69,8 +68,8 @@ router.get('/:QAId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT * FROM rememberIt.questionAnswers WHERE QAId = ?;",
-                [QAId],
+            connection.query("SELECT question, answer, QAId, QAType, QARank FROM rememberIt.questionAnswers WHERE QAId = ?;",
+                [qAId],
                 (error, results) => {
                     connection.release();
                     if (error) {
@@ -86,6 +85,49 @@ router.get('/:QAId', function(req, res) {
                             // console.log(JSON.stringify({message: "success", categories: results}))
                             res.send(
                                 JSON.stringify({message: "success", QA: results[0]})
+                            )
+                        }
+                    }
+                });
+        }
+    });
+});
+
+router.get('/categoryId=:categoryId', function(req, res) {
+
+    const { categoryId } = req.params
+    // console.log(categoryId)
+
+    const QAsTemp = {
+        question: "",
+        answer: "",
+        QAId: -1,
+        QARank: -1.00,
+        QAType: ""
+    }
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            console.error(err);
+        } else {
+            connection.query("SELECT question, answer, QAId, QAType, QARank FROM rememberIt.questionAnswers WHERE categoryId = ?;",
+                [categoryId],
+                (error, results) => {
+                    connection.release();
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error, QAs: QAsTemp})
+                        )
+                    } else {
+                        if(results.length === 0){
+                            res.send(
+                                JSON.stringify({message: "can not find QA", QAs: QAsTemp})
+                            )
+                        }else{
+                            // console.log(JSON.stringify({message: "success", categories: results}))
+                            res.send(
+                                JSON.stringify({message: "success", QAs: results})
                             )
                         }
                     }

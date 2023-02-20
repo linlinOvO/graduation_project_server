@@ -29,7 +29,7 @@ CREATE TABLE questionAnswers
     QAType       VARCHAR(20),
     question     TEXT,
     answer       TEXT,
-    QARank       DECIMAL(4, 2),
+    QARank       DECIMAL(7, 3),
     PRIMARY KEY  (QAId),
     FOREIGN KEY  (userId) REFERENCES accounts(userId),
     FOREIGN KEY  (categoryId) REFERENCES categories(categoryId)

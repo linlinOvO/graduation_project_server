@@ -113,27 +113,27 @@ router.post('/calendar', function(req, res) {
 
     let combinedQuery = ""
 
-    const loginQuery = `INSERT INTO rememberIt.checkIns (userId, checkInDate, rememberWell, remember, familiar, forgot)VALUES (?, ?, ?, ?, ?, ?);`
-    combinedQuery += loginQuery
+    const checkInQuery = `INSERT INTO rememberIt.checkIns (userId, checkInDate, rememberWell, remember, familiar, forgot)VALUES (?, ?, ?, ?, ?, ?);`
+    combinedQuery += checkInQuery
 
     if(rememberWell.length > 0){
         const rememberWellIds = rememberWell.join(',');
-        const rememberWellQuery = `UPDATE rememberIt.questionAnswers SET QARank = 100 WHERE userId = ? AND QAId IN (${rememberWellIds});`;
+        const rememberWellQuery = `UPDATE rememberIt.questionAnswers SET QARank = 1000 WHERE userId = ? AND QAId IN (${rememberWellIds});`;
         combinedQuery += rememberWellQuery
     }
     if(remember.length > 0){
         const rememberIds = remember.join(',');
-        const rememberQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 10 WHERE userId = ? AND QAId IN (${rememberIds});`;
+        const rememberQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 50 WHERE userId = ? AND QAId IN (${rememberIds});`;
         combinedQuery += rememberQuery
     }
     if(familiar.length > 0){
         const familiarIds = familiar.join(',');
-        const familiarQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 0 WHERE userId = ? AND QAId IN (${familiarIds});`;
+        const familiarQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 10 WHERE userId = ? AND QAId IN (${familiarIds});`;
         combinedQuery += familiarQuery
     }
     if(forgot.length > 0){
         const forgotIds = forgot.join(',');
-        const forgotQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank - 10 WHERE userId = ? AND QAId IN (${forgotIds})`;
+        const forgotQuery = `UPDATE rememberIt.questionAnswers SET QARank = 25 WHERE userId = ? AND QAId IN (${forgotIds});`;
         combinedQuery += forgotQuery
     }
     pool.getConnection((err, connection) => {
@@ -158,6 +158,7 @@ router.post('/calendar', function(req, res) {
         }
     });
 });
+
 router.get('/profile/userId=:userId/', function(req, res) {
 
     const {userId} = req.params

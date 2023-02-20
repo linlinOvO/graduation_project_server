@@ -48,6 +48,32 @@ pool.getConnection((err, connection) => {
   }
 });
 
+// update QARank every day at 00:00
+function outputOneAtMidnight() {
+  setInterval(() => {
+    const now = new Date();
+    if (now.getHours() === 0 && now.getMinutes() === 0) {
+      pool.getConnection((err, connection) => {
+        if (err) {
+          // handle error
+          console.error(err);
+        } else {
+          connection.query('UPDATE rememberIt.questionAnswers SET QARank = QARank * 0.8 WHERE QARank < 1000', (error) => {
+            connection.release();
+            if (error) {
+              // handle error
+              console.error(error);
+            }
+          });
+        }
+      });
+    }
+  }, 60000 * 60 * 6); // Check 6 hours
+}
+
+outputOneAtMidnight();
+
+
 
 // routes
 app.use('/', indexRouter);
