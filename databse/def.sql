@@ -110,3 +110,24 @@ CREATE TABLE checkInRecord
     mostContinuallyCheckIn INT NOT NULL,
     FOREIGN KEY            (userId) REFERENCES accounts(userId)
 );
+
+
+CREATE TABLE todayQuestionAnswers
+(
+    QAId         INT,
+    userId       INT,
+    categoryName VARCHAR(50) NOT NULL,
+    categoryId   INT,
+    FOREIGN KEY  (QAId) REFERENCES questionAnswers(QAId),
+    FOREIGN KEY  (userId) REFERENCES accounts(userId),
+    FOREIGN KEY  (categoryId) REFERENCES categories(categoryId)
+);
+
+
+
+CREATE TABLE todayQADate
+(
+    userId      INT NOT NULL,
+    todayQADate DATE NOT NULL,
+    FOREIGN KEY (userId) REFERENCES accounts(userId)
+);

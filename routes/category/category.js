@@ -61,7 +61,7 @@ const pool = require('../database')
 
 router.get('/today/userId=:userId', function(req, res) {
 
-    const userId = req.params.userId
+    const { userId } = req.params
     // console.log(userId)
 
     const categoriesTemp = [{
@@ -70,40 +70,132 @@ router.get('/today/userId=:userId', function(req, res) {
         categoryId: -1
     }]
 
+    const today = new Date().toISOString().slice(0, 10);
+
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT qA.QAId, c.categoryName, c.categoryId \n" +
-                "FROM rememberIt.questionAnswers qA\n" +
-                "JOIN rememberIt.categories c ON c.categoryId = qA.categoryId \n" +
-                "WHERE qA.userId = ? AND QARank < 60\n" +
-                "ORDER BY QARank ;",
-                [userId],
-                (error, results) => {
-                    connection.release();
-                    if (error) {
-                        // handle error
-                        // console.error(error);
-                        // console.log(JSON.stringify({message: error, categories: QAsTemp}) )
-                        res.send(
-                            JSON.stringify({message: error, categories: categoriesTemp})
-                        )
-                    } else {
-                        if(results.length === 0){
-                            // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
+            // select the row with the specified user ID from todayQADate table
+            const selectTodayQADate = `SELECT * FROM rememberIt.todayQADate WHERE userId = ?;`;
+            // insert a new row with the specified user ID and formatted date
+            const insertTodayQADate = `INSERT INTO rememberIt.todayQADate (userId, todayQADate) VALUES (?, NOW());`;
+            // update a new row with the specified user ID and formatted date
+            const updateTodayQADate = `UPDATE rememberIt.todayQADate SET todayQADate = NOW() WHERE userId = ?;`;
+            // select specific rows from questionAnswer table
+            const selectQuestionAnswers = "SELECT qA.QAId, c.categoryName, c.categoryId FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank;";
+            // select all rows from todayQuestionAnswers table
+            const selectTodayQuestionAnswers = 'SELECT * FROM rememberIt.todayQuestionAnswers WHERE userId = ?;';
+            // insert todayQuestionAnswers from questionAnswers
+            const insertTodayQuestionAnswers = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId) SELECT qA.QAId, ?, c.categoryName, c.categoryId FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank;"
+
+            connection.query(selectTodayQADate, [userId], (error, results) => {
+                // console.log(results)
+                if (error) {
+                    res.send(
+                        JSON.stringify({message: error, categories: categoriesTemp})
+                    )
+                } else if (results.length === 0) {
+                    // if no rows were found, insert a new row with the specified user ID and formatted date
+                    connection.query(insertTodayQADate + selectQuestionAnswers + insertTodayQuestionAnswers,
+                        [userId, userId, userId, userId], (error, results) => {
+                        if (error) {
                             res.send(
-                                JSON.stringify({message: "No QA for today", categories: categoriesTemp})
+                                JSON.stringify({message: error, categories: categoriesTemp})
                             )
-                        }else{
-                            // console.log(JSON.stringify({message: "success", categories: results}))
-                            res.send(
-                                JSON.stringify({message: "success", categories: transformList(results)})
-                            )
+                        } else {
+                            const categoriesResults = results[1]
+                            if(categoriesResults.length === 0){
+                                // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
+                                res.send(
+                                    JSON.stringify({message: "No QA for today", categories: categoriesTemp})
+                                )
+                            }else{
+                                // console.log(JSON.stringify({message: "success", categories: results}))
+                                res.send(
+                                    JSON.stringify({message: "success", categories: transformList(categoriesResults)})
+                                )
+                            }
                         }
+                    });
+                } else {
+                    // if a row was found, check if the todayQADate value matches the formatted date string
+                    if (results[0].todayQADate.toISOString().slice(0, 10) === today) {
+                        // console.log("i am here")
+                        connection.query(selectTodayQuestionAnswers, [userId], (error, results) => {
+                            if (error) {
+                                res.send(
+                                    JSON.stringify({message: error, categories: categoriesTemp})
+                                )
+                            } else {
+                                if(results.length === 0){
+                                    // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
+                                    res.send(
+                                        JSON.stringify({message: "No QA for today", categories: categoriesTemp})
+                                    )
+                                }else{
+                                    // console.log(JSON.stringify({message: "success", categories: results}))
+                                    res.send(
+                                        JSON.stringify({message: "success", categories: transformList(results)})
+                                    )
+                                }
+                            }
+                        });
+                    } else {
+                        connection.query(selectQuestionAnswers + updateTodayQADate + insertTodayQuestionAnswers,
+                            [userId, userId, userId, userId], (error, results) => {
+                            if (error) {
+                                res.send(
+                                    JSON.stringify({message: error, categories: categoriesTemp})
+                                )
+                            } else {
+                                if(results.length === 0){
+                                    // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
+                                    res.send(
+                                        JSON.stringify({message: "No QA for today", categories: categoriesTemp})
+                                    )
+                                }else{
+                                    // console.log(JSON.stringify({message: "success", categories: results}))
+                                    res.send(
+                                        JSON.stringify({message: "success", categories: transformList(results[0])})
+                                    )
+                                }
+                            }
+                        });
                     }
-                });
+                }
+            });
+
+            // connection.query("SELECT qA.QAId, c.categoryName, c.categoryId \n" +
+            //     "FROM rememberIt.questionAnswers qA\n" +
+            //     "JOIN rememberIt.categories c ON c.categoryId = qA.categoryId \n" +
+            //     "WHERE qA.userId = ? AND QARank < 60\n" +
+            //     "ORDER BY QARank;",
+            //     [userId],
+            //     (error, results) => {
+            //         connection.release();
+            //         if (error) {
+            //             // handle error
+            //             // console.error(error);
+            //             // console.log(JSON.stringify({message: error, categories: QAsTemp}) )
+            //             res.send(
+            //                 JSON.stringify({message: error, categories: categoriesTemp})
+            //             )
+            //         } else {
+            //             if(results.length === 0){
+            //                 // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
+            //                 res.send(
+            //                     JSON.stringify({message: "No QA for today", categories: categoriesTemp})
+            //                 )
+            //             }else{
+            //                 // console.log(JSON.stringify({message: "success", categories: results}))
+            //                 res.send(
+            //                     JSON.stringify({message: "success", categories: transformList(results)})
+            //                 )
+            //             }
+            //         }
+            //     });
         }
     });
 });

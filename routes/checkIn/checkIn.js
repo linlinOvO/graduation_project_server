@@ -109,40 +109,40 @@ router.get('/calendar/userId=:userId/checkInDate=:checkInDate', function(req, re
 router.post('/calendar', function(req, res) {
 
     const {userId, checkInDate, rememberWell, remember, familiar, forgot} = req.body
-    console.log(rememberWell, remember, familiar, forgot)
+    // console.log(rememberWell, remember, familiar, forgot)
 
     let combinedQuery = ""
 
     const checkInQuery = `INSERT INTO rememberIt.checkIns (userId, checkInDate, rememberWell, remember, familiar, forgot)VALUES (?, ?, ?, ?, ?, ?);`
     combinedQuery += checkInQuery
 
-    if(rememberWell.length > 0){
-        const rememberWellIds = rememberWell.join(',');
-        const rememberWellQuery = `UPDATE rememberIt.questionAnswers SET QARank = 1000 WHERE userId = ? AND QAId IN (${rememberWellIds});`;
-        combinedQuery += rememberWellQuery
-    }
-    if(remember.length > 0){
-        const rememberIds = remember.join(',');
-        const rememberQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 50 WHERE userId = ? AND QAId IN (${rememberIds});`;
-        combinedQuery += rememberQuery
-    }
-    if(familiar.length > 0){
-        const familiarIds = familiar.join(',');
-        const familiarQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 10 WHERE userId = ? AND QAId IN (${familiarIds});`;
-        combinedQuery += familiarQuery
-    }
-    if(forgot.length > 0){
-        const forgotIds = forgot.join(',');
-        const forgotQuery = `UPDATE rememberIt.questionAnswers SET QARank = 25 WHERE userId = ? AND QAId IN (${forgotIds});`;
-        combinedQuery += forgotQuery
-    }
+    // if(rememberWell.length > 0){
+    //     const rememberWellIds = rememberWell.join(',');
+    //     const rememberWellQuery = `UPDATE rememberIt.questionAnswers SET QARank = 1000 WHERE userId = ? AND QAId IN (${rememberWellIds});`;
+    //     combinedQuery += rememberWellQuery
+    // }
+    // if(remember.length > 0){
+    //     const rememberIds = remember.join(',');
+    //     const rememberQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 50 WHERE userId = ? AND QAId IN (${rememberIds});`;
+    //     combinedQuery += rememberQuery
+    // }
+    // if(familiar.length > 0){
+    //     const familiarIds = familiar.join(',');
+    //     const familiarQuery = `UPDATE rememberIt.questionAnswers SET QARank = QARank + 10 WHERE userId = ? AND QAId IN (${familiarIds});`;
+    //     combinedQuery += familiarQuery
+    // }
+    // if(forgot.length > 0){
+    //     const forgotIds = forgot.join(',');
+    //     const forgotQuery = `UPDATE rememberIt.questionAnswers SET QARank = 25 WHERE userId = ? AND QAId IN (${forgotIds});`;
+    //     combinedQuery += forgotQuery
+    // }
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
             connection.query(combinedQuery,
-                [userId, checkInDate, rememberWell.length, remember.length, familiar.length, forgot.length, userId, userId, userId, userId],
+                [userId, checkInDate, rememberWell.length, remember.length, familiar.length, forgot.length],
                 (error) => {
                     connection.release();
                     if (error) {

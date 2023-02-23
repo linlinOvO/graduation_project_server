@@ -53,7 +53,7 @@ router.get('/:categoryId/:userId', function(req, res) {
 router.get('/qAId=:qAId', function(req, res) {
 
     const { qAId } = req.params
-    console.log(qAId)
+    // console.log(qAId)
 
     const QATemp = {
         question: "",
@@ -174,6 +174,50 @@ router.delete('/QAId=:QAId', function (req, res){
         } else {
             connection.query("DELETE FROM rememberIt.questionAnswers WHERE QAId = ?;",
                 [QAId],
+                (error) => {
+                    // console.log(results)
+                    connection.release();
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error})
+                        )
+                    } else {
+                        res.send(
+                            JSON.stringify({message: "success"})
+                        )
+                    }
+                });
+        }
+    });
+})
+
+router.delete('/today/QAId=:QAId/choice=:choice', function (req, res){
+    const { QAId, choice } = req.params
+    // console.log(userId, checkInDate)
+
+    const deleteTodayQA = "DELETE FROM rememberIt.todayQuestionAnswers WHERE QAId = ?;"
+
+    let updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 25 WHERE QAId = ?";
+    switch (choice) {
+        case "rememberWell":
+            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 1000 WHERE QAId = ?";
+            break;
+        case "remember":
+            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 50 WHERE QAId = ?";
+            break;
+        case "familiar":
+            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 10 WHERE QAId = ?";
+            break;
+    }
+
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            console.error(err);
+        } else {
+            connection.query(deleteTodayQA + updateQARank,
+                [QAId, QAId],
                 (error) => {
                     // console.log(results)
                     connection.release();
