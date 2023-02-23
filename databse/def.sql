@@ -111,7 +111,6 @@ CREATE TABLE checkInRecord
     FOREIGN KEY            (userId) REFERENCES accounts(userId)
 );
 
-
 CREATE TABLE todayQuestionAnswers
 (
     QAId         INT,
@@ -122,8 +121,6 @@ CREATE TABLE todayQuestionAnswers
     FOREIGN KEY  (userId) REFERENCES accounts(userId),
     FOREIGN KEY  (categoryId) REFERENCES categories(categoryId)
 );
-
-
 
 CREATE TABLE todayQADate
 (

@@ -207,13 +207,7 @@ router.get('/userId=:userId', function(req, res) {
 
     const QAsTemp = [{
         categoryName: "",
-        QAs: [{
-            question: "",
-            answer: "",
-            QAType: "",
-            QAId: -1,
-            QARank: -1.00
-        }],
+        QAIds: [-1],
         categoryId: -1
     }]
 
@@ -222,7 +216,7 @@ router.get('/userId=:userId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT c.*, qa.question, qa.answer, qa.QARank, qa.QAId, qa.QAType FROM rememberIt.categories c LEFT JOIN rememberIt.questionAnswers qa ON c.categoryId = qa.categoryId AND qa.userId = c.userId WHERE c.userId = ? ORDER BY categoryId, qa.QAId;",
+            connection.query("SELECT c.categoryId, c.categoryName, qa.QAId FROM rememberIt.categories c LEFT JOIN rememberIt.questionAnswers qa ON c.categoryId = qa.categoryId AND qa.userId = c.userId WHERE c.userId = ? ORDER BY categoryId, qa.QAId;",
                 [userId],
                 (error, results) => {
                     connection.release();

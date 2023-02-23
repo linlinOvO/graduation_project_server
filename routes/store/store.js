@@ -366,6 +366,68 @@ router.delete('/like/userId=:userId/productId=:productId', function (req, res){
 })
 
 
+router.post('/product/download', function (req, res){
+    const {userId, categoryName, productId} = req.body
+    // console.log(userId, checkInDate)
+
+    const QAsTemp = [{
+        categoryName: "",
+        QAIds: [-1],
+        categoryId: -1
+    }]
+
+
+    function transformList(list) {
+        const QAsTemp = [];
+        list.forEach(item => {
+            // console.log(item)
+            // console.log(item.categoryId)
+            const foundIndex = QAsTemp.findIndex(tempItem => tempItem.categoryId === item.categoryId);
+            // console.log(item)
+            if (foundIndex === -1) {
+                QAsTemp.push({
+                    categoryName: item.categoryName,
+                    QAIds: item.question === null ? []: [item.QAId],
+                    categoryId: item.categoryId
+                });
+            } else {
+                // console.log(item.userId)
+                QAsTemp[foundIndex].QAIds.push(item.QAId);
+            }
+        });
+        return QAsTemp.sort((a, b) => a.categoryId - b.categoryId);
+    }
+
+    const insertCategory = "INSERT INTO rememberIt.categories (userId, categoryName) VALUES (?, ?);"
+    const setCategoryId = "SET @newId = LAST_INSERT_ID();"
+    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank) SELECT ?, @newId, QAType, question, answer, 25 FROM rememberIt.productQAs WHERE productId = ?;"
+    const selectCategory = "SELECT c.categoryId, c.categoryName, qa.QAId FROM rememberIt.categories c LEFT JOIN rememberIt.questionAnswers qa ON c.categoryId = qa.categoryId AND qa.userId = c.userId WHERE c.categoryId = @newId ORDER BY qa.QAId;"
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            res.send(
+                JSON.stringify({message: err.toString(), category: QAsTemp})
+            )
+        } else {
+            connection.query(insertCategory + setCategoryId + insertQA + selectCategory,
+                [userId, categoryName, userId, productId],
+                (error, results) => {
+                    // console.log(results[1][0].categoryId)
+                    connection.release();
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error, category: QAsTemp})
+                        )
+                    } else {
+                        res.send(
+                            JSON.stringify({message: "success", category: transformList(results[3])[0]})
+                        )
+                    }
+                });
+        }
+    });
+})
 
 router.put('/product', function (req, res){
     const { productId, title, productDescription } = req.body
