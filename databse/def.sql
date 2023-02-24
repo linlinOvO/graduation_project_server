@@ -5,7 +5,6 @@ CREATE TABLE accounts
     password    VARCHAR(50) NOT NULL,
     avatar      VARCHAR(255) NOT NULL,
     email       VARCHAR(225) NOT NULL,
-    phone       VARCHAR(50) NOT NULL,
     bornDate    DATE         NOT NULL,
     description VARCHAR(255) NOT NULL,
     lifeMotto   VARCHAR(255) NOT NULL,
