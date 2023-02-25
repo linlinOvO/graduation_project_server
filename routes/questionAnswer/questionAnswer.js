@@ -145,7 +145,7 @@ router.post('', function (req, res){
             console.error(err);
         } else {
             connection.query("INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank)VALUES (?, ?, ?, ?, ?, ?); SELECT QAId FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? AND question = ? AND answer = ? AND QARank = ?;",
-                [userId, categoryId, QAType, question, answer, QARank, userId, categoryId, question, answer, QARank],
+                [userId, categoryId, QAType, question, answer, QARank, userId, categoryId, question, answer, 32],
                 (error, results) => {
                     // console.log(results)
                     connection.release();
@@ -197,16 +197,16 @@ router.delete('/today/QAId=:QAId/choice=:choice', function (req, res){
 
     const deleteTodayQA = "DELETE FROM rememberIt.todayQuestionAnswers WHERE QAId = ?;"
 
-    let updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 25 WHERE QAId = ?";
+    let updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 0 WHERE QAId = ?";
     switch (choice) {
         case "rememberWell":
-            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 1000 WHERE QAId = ?";
+            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 200 WHERE QAId = ?";
             break;
         case "remember":
-            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 50 WHERE QAId = ?";
+            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 70 WHERE QAId = ?";
             break;
         case "familiar":
-            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 10 WHERE QAId = ?";
+            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 32 WHERE QAId = ?";
             break;
     }
 

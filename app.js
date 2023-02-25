@@ -58,7 +58,9 @@ function outputOneAtMidnight() {
           // handle error
           console.error(err);
         } else {
-          connection.query('UPDATE rememberIt.questionAnswers SET QARank = QARank * 0.8 WHERE QARank < 1000', (error) => {
+          const updateQARank = 'UPDATE rememberIt.questionAnswers SET QARank = QARank * 0.8 WHERE QARank < 200;'
+          const deleteTodayQAs = 'DELETE FROM rememberIt.todayQuestionAnswers;'
+          connection.query(updateQARank + deleteTodayQAs, (error) => {
             connection.release();
             if (error) {
               // handle error
@@ -68,7 +70,7 @@ function outputOneAtMidnight() {
         }
       });
     }
-  }, 60000 * 60 * 6); // Check 6 hours
+  }, 60000); // Check every minute
 }
 
 outputOneAtMidnight();
