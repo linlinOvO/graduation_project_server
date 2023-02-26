@@ -80,15 +80,15 @@ router.get('/today/userId=:userId', function(req, res) {
             // select the row with the specified user ID from todayQADate table
             const selectTodayQADate = `SELECT * FROM rememberIt.todayQADate WHERE userId = ?;`;
             // insert a new row with the specified user ID and formatted date
-            const insertTodayQADate = `INSERT INTO rememberIt.todayQADate (userId, todayQADate) VALUES (?, NOW());`;
+            const insertTodayQADate = `INSERT INTO rememberIt.todayQADate (userId, todayQADate, rememberWell, remember, familiar, forgot) VALUES (?, NOW(), 0, 0, 0, 0);`;
             // update a new row with the specified user ID and formatted date
             const updateTodayQADate = `UPDATE rememberIt.todayQADate SET todayQADate = NOW() WHERE userId = ?;`;
             // select specific rows from questionAnswer table
-            const selectQuestionAnswers = "SELECT qA.QAId, c.categoryName, c.categoryId FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank;";
+            const selectQuestionAnswers = "SELECT qA.QAId, c.categoryName, c.categoryId FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank LIMIT 1;";
             // select all rows from todayQuestionAnswers table
             const selectTodayQuestionAnswers = 'SELECT * FROM rememberIt.todayQuestionAnswers WHERE userId = ?;';
             // insert todayQuestionAnswers from questionAnswers
-            const insertTodayQuestionAnswers = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId) SELECT qA.QAId, ?, c.categoryName, c.categoryId FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank;"
+            const insertTodayQuestionAnswers = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId, round) SELECT qA.QAId, ?, c.categoryName, c.categoryId, 1 FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank LIMIT 1;"
 
             connection.query(selectTodayQADate, [userId], (error, results) => {
                 // console.log(results)

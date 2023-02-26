@@ -1,5 +1,6 @@
 DROP TABLE todayQuestionAnswers;
 DROP TABLE todayQADate;
+DROP TABLE studyPlan;
 DROP TABLE questionAnswers;
 DROP TABLE categories;
 DROP TABLE checkIns;

@@ -116,6 +116,7 @@ CREATE TABLE todayQuestionAnswers
     userId       INT,
     categoryName VARCHAR(50) NOT NULL,
     categoryId   INT,
+    round        INT,
     FOREIGN KEY  (QAId) REFERENCES questionAnswers(QAId),
     FOREIGN KEY  (userId) REFERENCES accounts(userId),
     FOREIGN KEY  (categoryId) REFERENCES categories(categoryId)
@@ -123,7 +124,18 @@ CREATE TABLE todayQuestionAnswers
 
 CREATE TABLE todayQADate
 (
+    userId       INT NOT NULL,
+    todayQADate  DATE NOT NULL,
+    rememberWell INT NOT NULL,
+    remember INT NOT NULL,
+    familiar INT NOT NULL,
+    forgot INT NOT NULL,
+    FOREIGN KEY  (userId) REFERENCES accounts(userId)
+);
+
+CREATE TABLE studyPlan
+(
     userId      INT NOT NULL,
-    todayQADate DATE NOT NULL,
+    studyPlan   DATE NOT NULL,
     FOREIGN KEY (userId) REFERENCES accounts(userId)
 );

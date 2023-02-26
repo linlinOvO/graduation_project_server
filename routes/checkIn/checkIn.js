@@ -109,7 +109,7 @@ router.get('/calendar/userId=:userId/checkInDate=:checkInDate', function(req, re
 router.post('/calendar', function(req, res) {
 
     const {userId, checkInDate, rememberWell, remember, familiar, forgot} = req.body
-    // console.log(rememberWell, remember, familiar, forgot)
+    console.log(rememberWell, remember, familiar, forgot)
 
     let combinedQuery = ""
 
@@ -136,13 +136,14 @@ router.post('/calendar', function(req, res) {
     //     const forgotQuery = `UPDATE rememberIt.questionAnswers SET QARank = 25 WHERE userId = ? AND QAId IN (${forgotIds});`;
     //     combinedQuery += forgotQuery
     // }
+
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
             connection.query(combinedQuery,
-                [userId, checkInDate, rememberWell.length, remember.length, familiar.length, forgot.length],
+                [userId, checkInDate, rememberWell, remember, familiar, forgot],
                 (error) => {
                     connection.release();
                     if (error) {
@@ -155,40 +156,6 @@ router.post('/calendar', function(req, res) {
                         )
                     }
             });
-        }
-    });
-});
-
-router.get('/profile/userId=:userId/', function(req, res) {
-
-    const {userId} = req.params
-
-    const checkInRecordTemp = {
-        continuallyCheckIn: 0,
-        totallyCheckIn: 0,
-        mostContinuallyCheckIn: 0
-    }
-
-    pool.getConnection((err, connection) => {
-        if (err) {
-            // handle error
-            console.error(err);
-        } else {
-            connection.query("SELECT continuallyCheckIn, totallyCheckIn, mostContinuallyCheckIn FROM rememberIt.checkInRecord where userId = ?;",
-                [userId],
-                (error, results) => {
-                    // console.log(results)
-                    connection.release();
-                    if (error) {
-                        res.send(
-                            JSON.stringify({message: error, checkInRecord: checkInRecordTemp})
-                        )
-                    } else {
-                        res.send(
-                            JSON.stringify({message: "success", checkInRecord: results[0]})
-                        )
-                    }
-                });
         }
     });
 });

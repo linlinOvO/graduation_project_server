@@ -18,6 +18,7 @@ const QARouter = require('./routes/questionAnswer/questionAnswer')
 const checkInRouter = require('./routes/checkIn/checkIn')
 const storeRouter = require('./routes/store/store')
 const accountRouter = require('./routes/account/account')
+const localRouter = require('./routes/local/local')
 
 
 const app = express();
@@ -90,6 +91,7 @@ app.use("/api/v1/q_a", QARouter)
 app.use("/api/v1/store", storeRouter)
 app.use("/api/v1/account", accountRouter)
 app.use("/api/v1/statistic", statisticRouter)
+app.use("/api/v1/local", localRouter)
 
 app.all('*', function(req, res, next) {
   setTimeout(function() {

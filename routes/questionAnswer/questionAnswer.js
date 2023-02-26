@@ -191,33 +191,75 @@ router.delete('/QAId=:QAId', function (req, res){
     });
 })
 
-router.delete('/today/QAId=:QAId/choice=:choice', function (req, res){
-    const { QAId, choice } = req.params
+// router.delete('/today/QAId=:QAId/choice=:choice', function (req, res){
+//     const { QAId, choice } = req.params
+//     // console.log(userId, checkInDate)
+//
+//     const deleteTodayQA = "DELETE FROM rememberIt.todayQuestionAnswers WHERE QAId = ?;"
+//
+//     // let updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 0 WHERE QAId = ?";
+//     // switch (choice) {
+//     //     case "rememberWell":
+//     //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 200 WHERE QAId = ?";
+//     //         break;
+//     //     case "remember":
+//     //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 70 WHERE QAId = ?";
+//     //         break;
+//     //     case "familiar":
+//     //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 32 WHERE QAId = ?";
+//     //         break;
+//     // }
+//
+//     pool.getConnection((err, connection) => {
+//         if (err) {
+//             // handle error
+//             console.error(err);
+//         } else {
+//             connection.query(deleteTodayQA,
+//                 [QAId],
+//                 (error) => {
+//                     // console.log(results)
+//                     connection.release();
+//                     if (error) {
+//                         res.send(
+//                             JSON.stringify({message: error})
+//                         )
+//                     } else {
+//                         res.send(
+//                             JSON.stringify({message: "success"})
+//                         )
+//                     }
+//                 });
+//         }
+//     });
+// })
+
+router.delete('/today/QAId=:QAId', function (req, res){
+    const { QAId } = req.params
     // console.log(userId, checkInDate)
 
     const deleteTodayQA = "DELETE FROM rememberIt.todayQuestionAnswers WHERE QAId = ?;"
 
-    let updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 0 WHERE QAId = ?";
-    switch (choice) {
-        case "rememberWell":
-            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 200 WHERE QAId = ?";
-            break;
-        case "remember":
-            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 70 WHERE QAId = ?";
-            break;
-        case "familiar":
-            updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 32 WHERE QAId = ?";
-            break;
-    }
-
+    // let updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 0 WHERE QAId = ?";
+    // switch (choice) {
+    //     case "rememberWell":
+    //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 200 WHERE QAId = ?";
+    //         break;
+    //     case "remember":
+    //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 70 WHERE QAId = ?";
+    //         break;
+    //     case "familiar":
+    //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 32 WHERE QAId = ?";
+    //         break;
+    // }
 
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query(deleteTodayQA + updateQARank,
-                [QAId, QAId],
+            connection.query(deleteTodayQA,
+                [QAId],
                 (error) => {
                     // console.log(results)
                     connection.release();
