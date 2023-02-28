@@ -139,13 +139,19 @@ router.get('/categoryId=:categoryId', function(req, res) {
 router.post('', function (req, res){
     const { userId, categoryId, QAType, question, answer, QARank } = req.body
 
+    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank)VALUES (?, ?, ?, ?, ?, ?);"
+
+    const selectQAId = "SELECT QAId FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? ORDER BY QAId DESC LIMIT 1;"
+
+    const insertLocal = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId, round) SELECT QAId, qa.userId, categoryName, qa.categoryId, 1 FROM rememberIt.questionAnswers qa, rememberIt.categories WHERE qa.userId = ? AND qa.categoryId = ? AND c.categoryId = qa.categoryId ORDER BY QAId DESC LIMIT 1;"
+
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank)VALUES (?, ?, ?, ?, ?, ?); SELECT QAId FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? AND question = ? AND answer = ? AND QARank = ?;",
-                [userId, categoryId, QAType, question, answer, QARank, userId, categoryId, question, answer, 32],
+            connection.query(insertQA + selectQAId + insertLocal,
+                [userId, categoryId, QAType, question, answer, 32, userId, categoryId, userId, categoryId],
                 (error, results) => {
                     // console.log(results)
                     connection.release();

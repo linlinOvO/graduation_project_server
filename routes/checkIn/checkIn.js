@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const pool = require('../database')
+const moment = require('moment');
 
 router.get('/calendar/userId=:userId/beginDate=:beginDate/endDate=:endDate', function(req, res) {
 
@@ -109,12 +110,16 @@ router.get('/calendar/userId=:userId/checkInDate=:checkInDate', function(req, re
 router.post('/calendar', function(req, res) {
 
     const {userId, checkInDate, rememberWell, remember, familiar, forgot} = req.body
-    console.log(rememberWell, remember, familiar, forgot)
+    // console.log(rememberWell, remember, familiar, forgot)
 
-    let combinedQuery = ""
+    let dateObj = moment(checkInDate).subtract(1, 'days').toDate();
+    let dateString = dateObj.toISOString().substring(0, 10);
 
     const checkInQuery = `INSERT INTO rememberIt.checkIns (userId, checkInDate, rememberWell, remember, familiar, forgot)VALUES (?, ?, ?, ?, ?, ?);`
-    combinedQuery += checkInQuery
+
+    const selectCheckInRecord = `SELECT * FROM remember.checkInRecord WHERE userId = ?`
+
+    const selectCheckInQuery = 'SELECT * FROM rememberIt.checkIns WHERE userId = ? AND checkInDate = ?'
 
     // if(rememberWell.length > 0){
     //     const rememberWellIds = rememberWell.join(',');
@@ -142,20 +147,77 @@ router.post('/calendar', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query(combinedQuery,
+            connection.query(checkInQuery,
                 [userId, checkInDate, rememberWell, remember, familiar, forgot],
                 (error) => {
-                    connection.release();
                     if (error) {
                         res.send(
-                            JSON.stringify({message: error})
-                        )
-                    } else {
-                        res.send(
-                            JSON.stringify({message: "success"})
+                            JSON.stringify({message: error.toString()})
                         )
                     }
-            });
+                });
+
+            connection.query(selectCheckInRecord,
+                [userId],
+                (error, result) => {
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error.toString()})
+                        )
+                    }else{
+                        if(result.length === 0){
+                            connection.query("INSERT INTO rememberIt.checkInRecord(userId, continuallyCheckIn, totallyCheckIn, mostContinuallyCheckIn) VALUES (?, 0, 0, 0);",
+                                [userId],
+                                (error) => {
+                                    if (error) {
+                                        res.send(
+                                            JSON.stringify({message: error.toString()})
+                                        )
+                                    }
+                                });
+                        }
+                    }
+                });
+
+            connection.query(selectCheckInQuery,
+                [userId, dateString],
+                (error, result) => {
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error.toString()})
+                        )
+                    } else {
+                        if(result.length > 0){
+                            connection.query("UPDATE rememberIt.checkInRecord SET continuallyCheckIn = continuallyCheckIn + 1, totallyCheckIn = totallyCheckIn + 1, mostContinuallyCheckIn = GREATEST(mostContinuallyCheckIn, continuallyCheckIn) WHERE userId = ?",
+                                [userId],
+                                (error) => {
+                                    if (error) {
+                                        res.send(
+                                            JSON.stringify({message: error.toString()})
+                                        )
+                                    } else {
+                                        res.send(
+                                            JSON.stringify({message: "success"})
+                                        )
+                                    }
+                                });
+                        }else{
+                            connection.query("UPDATE rememberIt.checkInRecord SET continuallyCheckIn = 0, totallyCheckIn = totallyCheckIn + 1 WHERE userId = ?",
+                                [userId],
+                                (error) => {
+                                    if (error) {
+                                        res.send(
+                                            JSON.stringify({message: error.toString()})
+                                        )
+                                    } else {
+                                        res.send(
+                                            JSON.stringify({message: "success"})
+                                        )
+                                    }
+                                });
+                        }
+                    }
+                });
         }
     });
 });

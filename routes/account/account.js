@@ -57,12 +57,14 @@ router.post('/logUp', function(req, res, next) {
 
     const { username, password, email, bornDate, description, lifeMotto } = req.body
 
+    const insertAccount = "INSERT INTO rememberIt.accounts (username, password, avatar, email, bornDate, description, lifeMotto)VALUES (?, ?, 'avatar', ?, ?, ?, ?);"
+
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.accounts (username, password, avatar, email, bornDate, description, lifeMotto)VALUES (?, ?, 'avatar', ?, ?, ?, ?);",
+            connection.query(insertAccount,
                 [username, password, email, bornDate, description, lifeMotto],
                 (error) => {
                     connection.release();
@@ -83,16 +85,54 @@ router.post('/logUp', function(req, res, next) {
 });
 
 router.put('', function (req, res){
-    const { username, description, lifeMotto, userId } = req.body
+    const { username, description, lifeMotto, userId, password, avatar, email, bornDate } = req.body
     // console.log(categoryId, categoryName)
+
+    let SqlSentence = "UPDATE rememberIt.accounts SET "
+    let parts = []
+    const params = []
+
+    if(username !== ""){
+        parts.push("username = ?")
+        params.push(username)
+    }
+    if(description !== ""){
+        parts.push("description = ?")
+        params.push(description)
+    }
+    if(lifeMotto !== ""){
+        parts.push("lifeMotto = ?")
+        params.push(lifeMotto)
+    }
+    if(avatar !== ""){
+        parts.push("avatar = ?")
+        params.push(avatar)
+    }
+    if(email !== ""){
+        parts.push("email = ?")
+        params.push(email)
+    }
+    if(bornDate !== ""){
+        parts.push("bornDate = ?")
+        params.push(bornDate)
+    }
+    if(password !== ""){
+        parts.push("password = ?")
+        params.push(password)
+    }
+
+    SqlSentence += parts.join(", ") + " WHERE userId = ?;"
+    params.push(userId)
+    console.log(SqlSentence)
+    console.log(params)
 
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query("UPDATE rememberIt.accounts SET username = ?, description = ?, life_motto = ? WHERE userId = ?;",
-                [username, description, lifeMotto, userId],
+            connection.query(SqlSentence,
+                params,
                 (error) => {
                     // console.log(results)
                     connection.release();
@@ -113,30 +153,29 @@ router.put('', function (req, res){
 router.get('/verify/email=:email', function (req, res) {
     const { email } = req.params;
 
-    pool.getConnection((err, connection) => {
-        if (err) {
-            // handle error
-            console.error(err);
-        } else {
-            connection.query("SELECT * FROM rememberIt.accounts WHERE email = ?",
-                [email],
-                (error, result) => {
-                    // console.log(results)
-                    connection.release();
-                    if (error) {
-                        res.send(
-                            JSON.stringify({message: error})
-                        )
-                    }
-                    if(result.length > 0){
-                        res.send(
-                            JSON.stringify({message: "The email has already been used"})
-                        )
-                    }
-                });
-        }
-    });
-
+    // pool.getConnection((err, connection) => {
+    //     if (err) {
+    //         // handle error
+    //         console.error(err);
+    //     } else {
+    //         connection.query("SELECT * FROM rememberIt.accounts WHERE email = ?",
+    //             [email],
+    //             (error, result) => {
+    //                 // console.log(results)
+    //                 connection.release();
+    //                 if (error) {
+    //                     res.send(
+    //                         JSON.stringify({message: error})
+    //                     )
+    //                 }
+    //                 if(result.length > 0){
+    //                     res.send(
+    //                         JSON.stringify({message: "The email has already been used"})
+    //                     )
+    //                 }
+    //             });
+    //     }
+    // });
 
     const code = Math.floor(100000 + Math.random() * 900000); // generate 6-digit code
     const transporter = nodemailer.createTransport({
@@ -173,6 +212,38 @@ The Remember It Team`
         } else {
             console.log('Verification code sent: ' + info.response);
             res.status(200).send(JSON.stringify({message: `success ${code}`}));
+        }
+    });
+});
+
+
+router.get('/check/email=:email', function (req, res) {
+    const { email } = req.params;
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            console.error(err);
+        } else {
+            connection.query("SELECT userId FROM rememberIt.accounts WHERE email = ?",
+                [email],
+                (error, result) => {
+                    connection.release();
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error})
+                        )
+                    }
+                    if(result.length === 0){
+                        res.send(
+                            JSON.stringify({message: "no account"})
+                        )
+                    }else{
+                        res.send(
+                            JSON.stringify({message: `exist ${result[0].userId}`})
+                        )
+                    }
+                });
         }
     });
 });

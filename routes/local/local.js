@@ -184,4 +184,31 @@ router.put('/round/qAId=:qAId', function(req, res) {
     });
 });
 
+router.put('/studyPlan', function(req, res) {
+
+    const { userId, studyPlan } = req.body
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            console.error(err);
+        } else {
+            connection.query("UPDATE rememberIt.studyPlan SET studyPlan = ? WHERE userId = ?;",
+                [studyPlan, userId],
+                (error) => {
+                    connection.release();
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error.toString()})
+                        )
+                    } else {
+                        res.send(
+                            JSON.stringify({message: "success"})
+                        )
+                    }
+                });
+        }
+    });
+});
+
 module.exports = router;

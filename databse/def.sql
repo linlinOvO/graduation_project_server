@@ -103,7 +103,6 @@ CREATE TABLE memoryRecord
 CREATE TABLE checkInRecord
 (
     userId                 INT NOT NULL,
-    lastCheckIn            DATE NOT NULL,
     continuallyCheckIn     INT NOT NULL,
     totallyCheckIn         INT NOT NULL,
     mostContinuallyCheckIn INT NOT NULL,

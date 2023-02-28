@@ -180,6 +180,6 @@ VALUES
     (1, '2023-02-14', 93, 77, 94, 89),
     (1, '2023-02-15', 96, 81, 94, 93);
 
-INSERT INTO checkInRecord(userId, lastCheckIn, continuallyCheckIn, totallyCheckIn, mostContinuallyCheckIn)
+INSERT INTO checkInRecord(userId, continuallyCheckIn, totallyCheckIn, mostContinuallyCheckIn)
 VALUES
-    (1, '2023-2-14', 3, 10, 3);
+    (1, 3, 10, 3);

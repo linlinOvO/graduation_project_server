@@ -84,7 +84,7 @@ router.get('/today/userId=:userId', function(req, res) {
             // update a new row with the specified user ID and formatted date
             const updateTodayQADate = `UPDATE rememberIt.todayQADate SET todayQADate = NOW() WHERE userId = ?;`;
             // select specific rows from questionAnswer table
-            const selectQuestionAnswers = "SELECT qA.QAId, c.categoryName, c.categoryId FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank LIMIT 1;";
+            const selectQuestionAnswers = "SELECT qA.QAId, c.categoryName, c.categoryId FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank;";
             // select all rows from todayQuestionAnswers table
             const selectTodayQuestionAnswers = 'SELECT * FROM rememberIt.todayQuestionAnswers WHERE userId = ?;';
             // insert todayQuestionAnswers from questionAnswers
@@ -231,7 +231,7 @@ router.get('/userId=:userId', function(req, res) {
                         if(results.length === 0){
                             // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
                             res.send(
-                                JSON.stringify({message: "No QA", categories: QAsTemp})
+                                JSON.stringify({message: "None", categories: QAsTemp})
                             )
                         }else{
                             // console.log(JSON.stringify({message: "success", categories: results}))
@@ -298,8 +298,8 @@ router.post('', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.categories (userId, categoryName)VALUES (?, ?); SELECT categoryId FROM rememberIt.categories WHERE userId = ? AND categoryName = ?;",
-                [userId, categoryName, userId, categoryName],
+            connection.query("INSERT INTO rememberIt.categories (userId, categoryName)VALUES (?, ?); SELECT categoryId FROM rememberIt.categories WHERE userId = ? ORDER BY categoryId DESC LIMIT 1;",
+                [userId, categoryName, userId],
                 (error, results) => {
                     // console.log(results[1][0].categoryId)
                     connection.release();

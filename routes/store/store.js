@@ -399,9 +399,14 @@ router.post('/product/download', function (req, res){
     }
 
     const insertCategory = "INSERT INTO rememberIt.categories (userId, categoryName) VALUES (?, ?);"
+
     const setCategoryId = "SET @newId = LAST_INSERT_ID();"
-    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank) SELECT ?, @newId, QAType, question, answer, 25 FROM rememberIt.productQAs WHERE productId = ?;"
+
+    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank) SELECT ?, @newId, QAType, question, answer, 32 FROM rememberIt.productQAs WHERE productId = ?;"
+
     const selectCategory = "SELECT c.categoryId, c.categoryName, qa.QAId FROM rememberIt.categories c LEFT JOIN rememberIt.questionAnswers qa ON c.categoryId = qa.categoryId AND qa.userId = c.userId WHERE c.categoryId = @newId ORDER BY qa.QAId;"
+
+    const insertLocal = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId, round) SELECT QAId, ?, ?, @newId, 1 FROM rememberIt.questionAnswers WHERE categoryId = @newId"
 
     pool.getConnection((err, connection) => {
         if (err) {
@@ -410,8 +415,8 @@ router.post('/product/download', function (req, res){
                 JSON.stringify({message: err.toString(), category: QAsTemp})
             )
         } else {
-            connection.query(insertCategory + setCategoryId + insertQA + selectCategory,
-                [userId, categoryName, userId, productId],
+            connection.query(insertCategory + setCategoryId + insertQA + selectCategory + insertLocal,
+                [userId, categoryName, userId, productId, userId, categoryName],
                 (error, results) => {
                     // console.log(results[1][0].categoryId)
                     connection.release();
