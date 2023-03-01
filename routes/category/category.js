@@ -381,11 +381,19 @@ function transformList(list) {
         const foundIndex = QAsTemp.findIndex(tempItem => tempItem.categoryId === item.categoryId);
         // console.log(item)
         if (foundIndex === -1) {
-            QAsTemp.push({
-                categoryName: item.categoryName,
-                QAIds: item.question === null ? []: [item.QAId],
-                categoryId: item.categoryId
-            });
+            if(item.QAId !== null){
+                QAsTemp.push({
+                    categoryName: item.categoryName,
+                    QAIds: [item.QAId],
+                    categoryId: item.categoryId
+                });
+            }else{
+                QAsTemp.push({
+                    categoryName: item.categoryName,
+                    QAIds: [],
+                    categoryId: item.categoryId
+                });
+            }
         } else {
             // console.log(item.userId)
             QAsTemp[foundIndex].QAIds.push(item.QAId);

@@ -217,7 +217,7 @@ router.get('/comment/productId=:productId', function (req, res) {
                 "FROM rememberIt.productComments c\n" +
                 "JOIN rememberIt.accounts a\n" +
                 "ON c.userId = a.userId\n" +
-                "WHERE c.productId = 1;",
+                "WHERE c.productId = ?;",
                 [productId],
                 (error, results) => {
                     connection.release();
@@ -291,8 +291,8 @@ router.post('/like', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.productLikes (productId, userId)VALUES (?, ?);",
-                [productId, userId],
+            connection.query("INSERT INTO rememberIt.productLikes (productId, userId)VALUES (?, ?); UPDATE rememberIt.products SET likeAmount = likeAmount + 1 WHERE productId = ?;",
+                [productId, userId, productId],
                 (error) => {
                     // console.log(results)
                     connection.release();
@@ -318,8 +318,10 @@ router.post('/comment', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query("INSERT INTO rememberIt.productComments (productId, userId, content)VALUES (?, ?, ?); SELECT commentId FROM rememberIt.productComments WHERE productId = ? AND userId = ? AND content = ? ORDER BY commentId DESC LIMIT 1;",
-                [productId, userId, content, productId, userId, content],
+            connection.query("INSERT INTO rememberIt.productComments (productId, userId, content)VALUES (?, ?, ?); " +
+                "SELECT commentId FROM rememberIt.productComments WHERE productId = ? AND userId = ? AND content = ? ORDER BY commentId DESC LIMIT 1; " +
+                "UPDATE rememberIt.products SET commentAmount = commentAmount + 1 WHERE productId = ?;",
+                [productId, userId, content, productId, userId, content, productId],
                 (error, results) => {
                     // console.log(results)
                     connection.release();
@@ -346,8 +348,8 @@ router.delete('/like/userId=:userId/productId=:productId', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query("DELETE FROM rememberIt.productLikes WHERE productId = ? and userId = ?;",
-                [productId, userId],
+            connection.query("DELETE FROM rememberIt.productLikes WHERE productId = ? and userId = ?; UPDATE rememberIt.products SET likeAmount = likeAmount - 1 WHERE productId = ?;",
+                [productId, userId, productId],
                 (error) => {
                     // console.log(results)
                     connection.release();
@@ -364,7 +366,6 @@ router.delete('/like/userId=:userId/productId=:productId', function (req, res){
         }
     });
 })
-
 
 router.post('/product/download', function (req, res){
     const {userId, categoryName, productId} = req.body

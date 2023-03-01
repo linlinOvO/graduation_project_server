@@ -12,24 +12,43 @@ router.get('/checkInRecord/userId=:userId', function(req, res) {
         mostContinuallyCheckIn: 0
     }
 
+    const selectCheckInRecord = "SELECT continuallyCheckIn, totallyCheckIn, mostContinuallyCheckIn FROM rememberIt.checkInRecord where userId = ?;"
+
+    const insertCheckInRecord = "INSERT INTO rememberIt.checkInRecord(userId, continuallyCheckIn, totallyCheckIn, mostContinuallyCheckIn) VALUES (?, 0, 0, 0);"
+
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT continuallyCheckIn, totallyCheckIn, mostContinuallyCheckIn FROM rememberIt.checkInRecord where userId = ?;",
+            connection.query(selectCheckInRecord,
                 [userId],
                 (error, results) => {
                     // console.log(results)
-                    connection.release();
                     if (error) {
                         res.send(
-                            JSON.stringify({message: error, checkInRecord: checkInRecordTemp})
+                            JSON.stringify({message: error.toString(), checkInRecord: checkInRecordTemp})
                         )
                     } else {
-                        res.send(
-                            JSON.stringify({message: "success", checkInRecord: results[0]})
-                        )
+                        if(results.length === 0){
+                            connection.query(selectCheckInRecord,
+                                [userId],
+                                (error) => {
+                                    if (error) {
+                                        res.send(
+                                            JSON.stringify({message: error.toString(), checkInRecord: checkInRecordTemp})
+                                        )
+                                    } else {
+                                        res.send(
+                                            JSON.stringify({message: "success", checkInRecord: checkInRecordTemp})
+                                        )
+                                    }
+                                });
+                        }else{
+                            res.send(
+                                JSON.stringify({message: "success", checkInRecord: results[0]})
+                            )
+                        }
                     }
                 });
         }
@@ -103,7 +122,7 @@ router.get('/todayMemoryRecord/userId=:userId/checkInDate=:checkInDate', functio
                             JSON.stringify({message: error.toString(), record: todayMemoryRecordTemp})
                         )
                     } else {
-                        console.log(results)
+                        // console.log(results)
                         res.send(
                             JSON.stringify({message: "success", record: results[0]})
                         )

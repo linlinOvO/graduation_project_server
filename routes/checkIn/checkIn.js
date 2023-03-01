@@ -55,7 +55,8 @@ router.get('/calendar/userId=:userId/beginDate=:beginDate/endDate=:endDate', fun
                 "WHERE userId = ? AND checkInDate BETWEEN ? AND ?;\n",
                 [userId, beginDate, endDate],
                 (error, results) => {
-                    // console.log(results)
+                    //
+                    //sults)
                     connection.release();
                     if (error) {
                         res.send(
@@ -74,7 +75,8 @@ router.get('/calendar/userId=:userId/beginDate=:beginDate/endDate=:endDate', fun
 router.get('/calendar/userId=:userId/checkInDate=:checkInDate', function(req, res) {
 
     const {userId, checkInDate} = req.params
-    console.log(userId, checkInDate)
+    //
+    //erId, checkInDate)
 
     const studyRecordTemp = {
         rememberWell: 0,
@@ -91,7 +93,8 @@ router.get('/calendar/userId=:userId/checkInDate=:checkInDate', function(req, re
             connection.query("SELECT rememberWell, remember, familiar, forgot FROM rememberIt.checkIns WHERE userId = ? AND checkInDate = ?;",
                 [userId, checkInDate],
                 (error, results) => {
-                    // console.log(results)
+                    //
+                    //sults)
                     connection.release();
                     if (error) {
                         res.send(
@@ -110,14 +113,22 @@ router.get('/calendar/userId=:userId/checkInDate=:checkInDate', function(req, re
 router.post('/calendar', function(req, res) {
 
     const {userId, checkInDate, rememberWell, remember, familiar, forgot} = req.body
-    // console.log(rememberWell, remember, familiar, forgot)
+    //
+    //memberWell, remember, familiar, forgot)
 
-    let dateObj = moment(checkInDate).subtract(1, 'days').toDate();
-    let dateString = dateObj.toISOString().substring(0, 10);
+    let dateObj = new Date(checkInDate)
+    dateObj.setDate(dateObj.getDate() - 1)
+
+    let year = dateObj.getFullYear();
+    let month = dateObj.getMonth() + 1; // add 1 to convert from 0-indexed to 1-indexed
+    let day = dateObj.getDate();
+    let formattedDate = year + '-' + month + '-' + day;
+    //
+    //teString)
 
     const checkInQuery = `INSERT INTO rememberIt.checkIns (userId, checkInDate, rememberWell, remember, familiar, forgot)VALUES (?, ?, ?, ?, ?, ?);`
 
-    const selectCheckInRecord = `SELECT * FROM remember.checkInRecord WHERE userId = ?`
+    const selectCheckInRecord = `SELECT * FROM rememberIt.checkInRecord WHERE userId = ?`
 
     const selectCheckInQuery = 'SELECT * FROM rememberIt.checkIns WHERE userId = ? AND checkInDate = ?'
 
@@ -154,6 +165,7 @@ router.post('/calendar', function(req, res) {
                         res.send(
                             JSON.stringify({message: error.toString()})
                         )
+                        return
                     }
                 });
 
@@ -164,6 +176,7 @@ router.post('/calendar', function(req, res) {
                         res.send(
                             JSON.stringify({message: error.toString()})
                         )
+                        return
                     }else{
                         if(result.length === 0){
                             connection.query("INSERT INTO rememberIt.checkInRecord(userId, continuallyCheckIn, totallyCheckIn, mostContinuallyCheckIn) VALUES (?, 0, 0, 0);",
@@ -173,6 +186,7 @@ router.post('/calendar', function(req, res) {
                                         res.send(
                                             JSON.stringify({message: error.toString()})
                                         )
+                                        return
                                     }
                                 });
                         }
@@ -180,12 +194,13 @@ router.post('/calendar', function(req, res) {
                 });
 
             connection.query(selectCheckInQuery,
-                [userId, dateString],
+                [userId, formattedDate],
                 (error, result) => {
                     if (error) {
                         res.send(
                             JSON.stringify({message: error.toString()})
                         )
+                        return
                     } else {
                         if(result.length > 0){
                             connection.query("UPDATE rememberIt.checkInRecord SET continuallyCheckIn = continuallyCheckIn + 1, totallyCheckIn = totallyCheckIn + 1, mostContinuallyCheckIn = GREATEST(mostContinuallyCheckIn, continuallyCheckIn) WHERE userId = ?",
@@ -195,10 +210,12 @@ router.post('/calendar', function(req, res) {
                                         res.send(
                                             JSON.stringify({message: error.toString()})
                                         )
+                                        return
                                     } else {
                                         res.send(
                                             JSON.stringify({message: "success"})
                                         )
+                                        return
                                     }
                                 });
                         }else{
@@ -209,10 +226,12 @@ router.post('/calendar', function(req, res) {
                                         res.send(
                                             JSON.stringify({message: error.toString()})
                                         )
+                                        return
                                     } else {
                                         res.send(
                                             JSON.stringify({message: "success"})
                                         )
+                                        return
                                     }
                                 });
                         }

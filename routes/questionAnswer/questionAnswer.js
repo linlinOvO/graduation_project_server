@@ -98,13 +98,13 @@ router.get('/categoryId=:categoryId', function(req, res) {
     const { categoryId } = req.params
     // console.log(categoryId)
 
-    const QAsTemp = {
+    const QAsTemp = [{
         question: "",
         answer: "",
         QAId: -1,
         QARank: -1.00,
         QAType: ""
-    }
+    }]
 
     pool.getConnection((err, connection) => {
         if (err) {
@@ -122,7 +122,7 @@ router.get('/categoryId=:categoryId', function(req, res) {
                     } else {
                         if(results.length === 0){
                             res.send(
-                                JSON.stringify({message: "can not find QA", QAs: QAsTemp})
+                                JSON.stringify({message: "none", QAs: QAsTemp})
                             )
                         }else{
                             // console.log(JSON.stringify({message: "success", categories: results}))
@@ -143,7 +143,7 @@ router.post('', function (req, res){
 
     const selectQAId = "SELECT QAId FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? ORDER BY QAId DESC LIMIT 1;"
 
-    const insertLocal = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId, round) SELECT QAId, qa.userId, categoryName, qa.categoryId, 1 FROM rememberIt.questionAnswers qa, rememberIt.categories WHERE qa.userId = ? AND qa.categoryId = ? AND c.categoryId = qa.categoryId ORDER BY QAId DESC LIMIT 1;"
+    const insertLocal = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId, round) SELECT QAId, qa.userId, categoryName, qa.categoryId, 1 FROM rememberIt.questionAnswers qa, rememberIt.categories c WHERE qa.userId = ? AND qa.categoryId = ? AND c.categoryId = qa.categoryId ORDER BY QAId DESC LIMIT 1;"
 
     pool.getConnection((err, connection) => {
         if (err) {
