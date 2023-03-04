@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const pool = require('../database')
-const moment = require('moment');
+// const moment = require('moment');
 
 router.get('/calendar/userId=:userId/beginDate=:beginDate/endDate=:endDate', function(req, res) {
 

@@ -248,4 +248,35 @@ router.get('/check/email=:email', function (req, res) {
     });
 });
 
+router.delete('/today/userId=:userId', function (req, res){
+    const { userId } = req.params
+    // console.log(userId, checkInDate)
+
+    const deleteTodayQA = "DELETE FROM rememberIt.accounts WHERE userId = ?;"
+
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            console.error(err);
+        } else {
+            connection.query(deleteTodayQA,
+                [userId],
+                (error) => {
+                    // console.log(results)
+                    connection.release();
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error.toString()})
+                        )
+                    } else {
+                        res.send(
+                            JSON.stringify({message: "success"})
+                        )
+                    }
+                });
+        }
+    });
+})
+
 module.exports = router;

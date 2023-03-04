@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const pool = require('./routes/database')
+const multer = require('multer');
 
 // routers
 const indexRouter = require('./routes/index');
@@ -19,6 +20,7 @@ const checkInRouter = require('./routes/checkIn/checkIn')
 const storeRouter = require('./routes/store/store')
 const accountRouter = require('./routes/account/account')
 const localRouter = require('./routes/local/local')
+const fileRouter = require('./routes/file')
 
 
 const app = express();
@@ -32,6 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // test connection of database
 pool.getConnection((err, connection) => {
@@ -78,6 +81,37 @@ outputOneAtMidnight();
 
 
 
+// Define the storage for the uploaded files
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, './upload/image');
+  },
+  filename: function(req, file, cb) {
+    cb(null, file.originalname);
+  }
+});
+
+// Create the multer instance to handle file upload
+const upload = multer({ storage: storage });
+
+// Define the API endpoint to handle the file upload
+app.post('/api/v1/file', upload.single('image'), (req, res) => {
+  console.log(111)
+  console.log(req)
+
+  res.setHeader('Content-Type', 'application/json');
+
+  if (req.file) {
+    console.log(`Received file: ${req.file.originalname}`);
+    res.status(200).send('File uploaded successfully');
+  } else {
+    res.status(400).send('No file uploaded');
+  }
+});
+
+
+
+
 // routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -92,6 +126,7 @@ app.use("/api/v1/store", storeRouter)
 app.use("/api/v1/account", accountRouter)
 app.use("/api/v1/statistic", statisticRouter)
 app.use("/api/v1/local", localRouter)
+// app.use("/api/v1/file", fileRouter)
 
 app.all('*', function(req, res, next) {
   setTimeout(function() {
