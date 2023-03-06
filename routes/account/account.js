@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const pool = require('../database')
 const nodemailer = require('nodemailer');
+const fs = require("fs");
 
 
 router.post('/login', function(req, res, next) {
@@ -55,9 +56,30 @@ router.post('/login', function(req, res, next) {
 
 router.post('/logUp', function(req, res, next) {
 
-    const { username, password, email, bornDate, description, lifeMotto } = req.body
+    const { username, password, email, bornDate, description, lifeMotto, avatar } = req.body
 
-    const insertAccount = "INSERT INTO rememberIt.accounts (username, password, avatar, email, bornDate, description, lifeMotto)VALUES (?, ?, 'avatar', ?, ?, ?, ?);"
+    let avatarPath = ""
+    if(avatar === "default"){
+        avatarPath += "image/default.png"
+    }else{
+        const d = new Date()
+        const filePath = `image/${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}-${d.getMinutes()}-${d.getSeconds()}.png`
+        avatarPath += filePath
+
+        const imageBuffer = Buffer.from(avatar, 'base64');
+
+        // Write buffer to a file
+        fs.writeFile(filePath, imageBuffer, function(err) {
+            if (err) {
+                console.log(err)
+                res.status(400).send(
+                    JSON.stringify({message: err.toString()})
+                )
+            }
+        });
+    }
+
+    const insertAccount = "INSERT INTO rememberIt.accounts (username, password, avatar, email, bornDate, description, lifeMotto)VALUES (?, ?, ?, ?, ?, ?, ?);"
 
     pool.getConnection((err, connection) => {
         if (err) {
@@ -65,7 +87,7 @@ router.post('/logUp', function(req, res, next) {
             console.error(err);
         } else {
             connection.query(insertAccount,
-                [username, password, email, bornDate, description, lifeMotto],
+                [username, password, avatarPath, email, bornDate, description, lifeMotto],
                 (error) => {
                     connection.release();
                     if (error) {
@@ -123,8 +145,8 @@ router.put('', function (req, res){
 
     SqlSentence += parts.join(", ") + " WHERE userId = ?;"
     params.push(userId)
-    console.log(SqlSentence)
-    console.log(params)
+    // console.log(SqlSentence)
+    // console.log(params)
 
     pool.getConnection((err, connection) => {
         if (err) {

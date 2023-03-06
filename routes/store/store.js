@@ -205,7 +205,8 @@ router.get('/comment/productId=:productId', function (req, res) {
     const commentsTemp = [{
         commentId: -1,
         content: "",
-        username: ""
+        username: "",
+        avatar: ""
     }]
 
     pool.getConnection((err, connection) => {
@@ -213,7 +214,7 @@ router.get('/comment/productId=:productId', function (req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT c.commentId, c.content, a.username\n" +
+            connection.query("SELECT c.commentId, c.content, a.username, a.avatar\n" +
                 "FROM rememberIt.productComments c\n" +
                 "JOIN rememberIt.accounts a\n" +
                 "ON c.userId = a.userId\n" +
@@ -249,7 +250,10 @@ router.get('/QA/productId=:productId', function (req, res) {
     const QAsTemp = [{
         question: "",
         answer: "",
-        QAType: ""
+        QAType: "",
+        photoOne: "",
+        photoTwo: "",
+        photoThree: ""
     }]
 
     pool.getConnection((err, connection) => {
@@ -257,7 +261,7 @@ router.get('/QA/productId=:productId', function (req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT question, answer, QAType FROM rememberIt.productQAs WHERE productId = ?;",
+            connection.query("SELECT question, answer, QAType, photoOne, photoTwo, photoThree FROM rememberIt.productQAs WHERE productId = ?;",
                 [productId],
                 (error, results) => {
                     connection.release();
@@ -403,7 +407,7 @@ router.post('/product/download', function (req, res){
 
     const setCategoryId = "SET @newId = LAST_INSERT_ID();"
 
-    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank) SELECT ?, @newId, QAType, question, answer, 32 FROM rememberIt.productQAs WHERE productId = ?;"
+    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank, photoOne, photoTwo, photoThree) SELECT ?, @newId, QAType, question, answer, 32, photoOne, photoTwo, photoThree FROM rememberIt.productQAs WHERE productId = ?;"
 
     const selectCategory = "SELECT c.categoryId, c.categoryName, qa.QAId FROM rememberIt.categories c LEFT JOIN rememberIt.questionAnswers qa ON c.categoryId = qa.categoryId AND qa.userId = c.userId WHERE c.categoryId = @newId ORDER BY qa.QAId;"
 

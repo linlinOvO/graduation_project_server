@@ -88,7 +88,7 @@ router.get('/today/userId=:userId', function(req, res) {
             // select all rows from todayQuestionAnswers table
             const selectTodayQuestionAnswers = 'SELECT * FROM rememberIt.todayQuestionAnswers WHERE userId = ?;';
             // insert todayQuestionAnswers from questionAnswers
-            const insertTodayQuestionAnswers = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId, round) SELECT qA.QAId, ?, c.categoryName, c.categoryId, 1 FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank LIMIT 1;"
+            const insertTodayQuestionAnswers = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId, round) SELECT qA.QAId, ?, c.categoryName, c.categoryId, 1 FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND QARank < 60 ORDER BY QARank;"
 
             connection.query(selectTodayQADate, [userId], (error, results) => {
                 // console.log(results)
@@ -122,7 +122,7 @@ router.get('/today/userId=:userId', function(req, res) {
                 } else {
                     // if a row was found, check if the todayQADate value matches the formatted date string
                     if (results[0].todayQADate.toISOString().slice(0, 10) === today) {
-                        // console.log("i am here")
+                        console.log("i am here")
                         connection.query(selectTodayQuestionAnswers, [userId], (error, results) => {
                             if (error) {
                                 res.send(

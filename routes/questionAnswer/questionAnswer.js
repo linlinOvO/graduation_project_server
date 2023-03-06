@@ -1,54 +1,57 @@
 var express = require('express');
 var router = express.Router();
 const pool = require('../database')
-
-router.get('/:categoryId/:userId', function(req, res) {
-
-    const { userId, categoryId } = req.params
-    console.log(userId, categoryId)
-
-    const QAsTemp = [{
-        question: "",
-        answer: "",
-        QAId: -1,
-        userId: -1,
-        categoryId: -1,
-        QARank: -1.00
-    }]
-
-    pool.getConnection((err, connection) => {
-        if (err) {
-            // handle error
-            console.error(err);
-        } else {
-            connection.query("SELECT * FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ?;",
-                [userId, categoryId],
-                (error, results) => {
-                    connection.release();
-                    if (error) {
-                        // handle error
-                        // console.error(error);
-                        // console.log(JSON.stringify({message: error, categories: QAsTemp}) )
-                        res.send(
-                            JSON.stringify({message: error, QAs: QAsTemp})
-                        )
-                    } else {
-                        if(results.length === 0){
-                            // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
-                            res.send(
-                                JSON.stringify({message: "No QAs", QAs: QAsTemp})
-                            )
-                        }else{
-                            // console.log(JSON.stringify({message: "success", categories: results}))
-                            res.send(
-                                JSON.stringify({message: "success", QAs: results})
-                            )
-                        }
-                    }
-                });
-        }
-    });
-});
+const fs = require("fs");
+//
+// router.get('/:categoryId/:userId', function(req, res) {
+//
+//     const { userId, categoryId } = req.params
+//     console.log(userId, categoryId)
+//
+//     const QAsTemp = [{
+//         question: "",
+//         answer: "",
+//         QAId: -1,
+//         userId: -1,
+//         QARank: -1.00,
+//         photoOne: "",
+//         photoTwo: "",
+//         photoThree: ""
+//     }]
+//
+//     pool.getConnection((err, connection) => {
+//         if (err) {
+//             // handle error
+//             console.error(err);
+//         } else {
+//             connection.query("SELECT * FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ?;",
+//                 [userId, categoryId],
+//                 (error, results) => {
+//                     connection.release();
+//                     if (error) {
+//                         // handle error
+//                         // console.error(error);
+//                         // console.log(JSON.stringify({message: error, categories: QAsTemp}) )
+//                         res.send(
+//                             JSON.stringify({message: error, QAs: QAsTemp})
+//                         )
+//                     } else {
+//                         if(results.length === 0){
+//                             // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
+//                             res.send(
+//                                 JSON.stringify({message: "No QAs", QAs: QAsTemp})
+//                             )
+//                         }else{
+//                             // console.log(JSON.stringify({message: "success", categories: results}))
+//                             res.send(
+//                                 JSON.stringify({message: "success", QAs: results})
+//                             )
+//                         }
+//                     }
+//                 });
+//         }
+//     });
+// });
 
 router.get('/qAId=:qAId', function(req, res) {
 
@@ -60,7 +63,10 @@ router.get('/qAId=:qAId', function(req, res) {
         answer: "",
         QAId: -1,
         QARank: -1.00,
-        QAType: ""
+        QAType: "",
+        photoOne: "",
+        photoTwo: "",
+        photoThree: ""
     }
 
     pool.getConnection((err, connection) => {
@@ -68,7 +74,7 @@ router.get('/qAId=:qAId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT question, answer, QAId, QAType, QARank FROM rememberIt.questionAnswers WHERE QAId = ?;",
+            connection.query("SELECT question, answer, QAId, QAType, QARank, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE QAId = ?;",
                 [qAId],
                 (error, results) => {
                     connection.release();
@@ -103,7 +109,10 @@ router.get('/categoryId=:categoryId', function(req, res) {
         answer: "",
         QAId: -1,
         QARank: -1.00,
-        QAType: ""
+        QAType: "",
+        photoOne: "",
+        photoTwo: "",
+        photoThree: ""
     }]
 
     pool.getConnection((err, connection) => {
@@ -111,7 +120,7 @@ router.get('/categoryId=:categoryId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT question, answer, QAId, QAType, QARank FROM rememberIt.questionAnswers WHERE categoryId = ?;",
+            connection.query("SELECT question, answer, QAId, QAType, QARank, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE categoryId = ?;",
                 [categoryId],
                 (error, results) => {
                     connection.release();
@@ -137,11 +146,23 @@ router.get('/categoryId=:categoryId', function(req, res) {
 });
 
 router.post('', function (req, res){
-    const { userId, categoryId, QAType, question, answer, QARank } = req.body
 
-    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank)VALUES (?, ?, ?, ?, ?, ?);"
+    const QATemp = {
+        question: "",
+        answer: "",
+        QAId: -1,
+        QARank: -1.00,
+        QAType: "",
+        photoOne: "",
+        photoTwo: "",
+        photoThree: ""
+    }
 
-    const selectQAId = "SELECT QAId FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? ORDER BY QAId DESC LIMIT 1;"
+    const { userId, categoryId, QAType, question, answer, photoOne, photoTwo, photoThree } = req.body
+
+    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank, photoOne, photoTwo, photoThree)VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"
+
+    const selectQA = "SELECT question, answer, QAId, QAType, QARank, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? ORDER BY QAId DESC LIMIT 1;"
 
     const insertLocal = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId, round) SELECT QAId, qa.userId, categoryName, qa.categoryId, 1 FROM rememberIt.questionAnswers qa, rememberIt.categories c WHERE qa.userId = ? AND qa.categoryId = ? AND c.categoryId = qa.categoryId ORDER BY QAId DESC LIMIT 1;"
 
@@ -150,18 +171,18 @@ router.post('', function (req, res){
             // handle error
             console.error(err);
         } else {
-            connection.query(insertQA + selectQAId + insertLocal,
-                [userId, categoryId, QAType, question, answer, 32, userId, categoryId, userId, categoryId],
+            connection.query(insertQA + selectQA + insertLocal,
+                [userId, categoryId, QAType, question, answer, 32, photoOne, photoTwo, photoThree, userId, categoryId, userId, categoryId],
                 (error, results) => {
                     // console.log(results)
                     connection.release();
                     if (error) {
                         res.send(
-                            JSON.stringify({message: error, newQAId: -1})
+                            JSON.stringify({message: error, newQA: QATemp})
                         )
                     } else {
                         res.send(
-                            JSON.stringify({message: "success", newQAId: results[1][0].QAId})
+                            JSON.stringify({message: "success", newQA: results[1][0]})
                         )
                     }
                 });
@@ -173,19 +194,22 @@ router.delete('/QAId=:QAId', function (req, res){
     const { QAId } = req.params
     // console.log(userId, checkInDate)
 
+    const deleteQuestionAnswer = "DELETE FROM rememberIt.questionAnswers WHERE QAId = ?;"
+    const deleteTodayQuestionAnswer = "DELETE FROM rememberIt.todayQuestionAnswers WHERE QAId = ?;"
+
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query("DELETE FROM rememberIt.questionAnswers WHERE QAId = ?;",
-                [QAId],
+            connection.query(deleteTodayQuestionAnswer + deleteQuestionAnswer,
+                [QAId, QAId],
                 (error) => {
                     // console.log(results)
                     connection.release();
                     if (error) {
                         res.send(
-                            JSON.stringify({message: error})
+                            JSON.stringify({message: error.toString()})
                         )
                     } else {
                         res.send(
@@ -197,67 +221,11 @@ router.delete('/QAId=:QAId', function (req, res){
     });
 })
 
-// router.delete('/today/QAId=:QAId/choice=:choice', function (req, res){
-//     const { QAId, choice } = req.params
-//     // console.log(userId, checkInDate)
-//
-//     const deleteTodayQA = "DELETE FROM rememberIt.todayQuestionAnswers WHERE QAId = ?;"
-//
-//     // let updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 0 WHERE QAId = ?";
-//     // switch (choice) {
-//     //     case "rememberWell":
-//     //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 200 WHERE QAId = ?";
-//     //         break;
-//     //     case "remember":
-//     //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 70 WHERE QAId = ?";
-//     //         break;
-//     //     case "familiar":
-//     //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 32 WHERE QAId = ?";
-//     //         break;
-//     // }
-//
-//     pool.getConnection((err, connection) => {
-//         if (err) {
-//             // handle error
-//             console.error(err);
-//         } else {
-//             connection.query(deleteTodayQA,
-//                 [QAId],
-//                 (error) => {
-//                     // console.log(results)
-//                     connection.release();
-//                     if (error) {
-//                         res.send(
-//                             JSON.stringify({message: error})
-//                         )
-//                     } else {
-//                         res.send(
-//                             JSON.stringify({message: "success"})
-//                         )
-//                     }
-//                 });
-//         }
-//     });
-// })
-
 router.delete('/today/QAId=:QAId', function (req, res){
     const { QAId } = req.params
     // console.log(userId, checkInDate)
 
     const deleteTodayQA = "DELETE FROM rememberIt.todayQuestionAnswers WHERE QAId = ?;"
-
-    // let updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 0 WHERE QAId = ?";
-    // switch (choice) {
-    //     case "rememberWell":
-    //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 200 WHERE QAId = ?";
-    //         break;
-    //     case "remember":
-    //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = QARank + 70 WHERE QAId = ?";
-    //         break;
-    //     case "familiar":
-    //         updateQARank = "UPDATE rememberIt.questionAnswers SET QARank = 32 WHERE QAId = ?";
-    //         break;
-    // }
 
     pool.getConnection((err, connection) => {
         if (err) {
@@ -284,32 +252,80 @@ router.delete('/today/QAId=:QAId', function (req, res){
 })
 
 router.put('', function (req, res){
-    const { QAId, question, answer, QARank } = req.body
+
+    const { QAId, question, answer, QARank, photoOne, photoTwo, photoThree } = req.body
     // console.log(userId, checkInDate)
+
+
+    let SqlSentence = "UPDATE rememberIt.questionAnswers SET "
+    let parts = []
+    const params = []
+
+    if(question !== ""){
+        parts.push("question = ?")
+        params.push(question)
+    }
+    if(answer !== ""){
+        parts.push("answer = ?")
+        params.push(answer)
+    }
+    if(QARank !== ""){
+        parts.push("QARank = ?")
+        params.push(QARank)
+    }
+    if(photoOne !== ""){
+        parts.push("photoOne = ?")
+        params.push(photoOne)
+    }
+    if(photoTwo !== ""){
+        parts.push("photoTwo = ?")
+        params.push(photoTwo)
+    }
+    if(photoThree !== ""){
+        parts.push("photoThree = ?")
+        params.push(photoThree)
+    }
+
+    SqlSentence += parts.join(", ") + " WHERE QAId = ?;"
+    params.push(QAId)
+
+    const selectQA = "SELECT question, answer, QAId, QAType, QARank, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE QAId = ?"
+
+    params.push(QAId)
+
+    const QATemp = {
+        question: "",
+        answer: "",
+        QAId: -1,
+        QARank: -1.00,
+        QAType: "",
+        photoOne: "",
+        photoTwo: "",
+        photoThree: ""
+    }
 
     pool.getConnection((err, connection) => {
         if (err) {
             // handle error
             console.error(err);
         } else {
-            connection.query("UPDATE rememberIt.questionAnswers SET question = ?, answer = ?, QARank = ? WHERE QAId = ?;",
-                [question, answer, QARank, QAId],
-                (error) => {
+            connection.query(SqlSentence + selectQA,
+                params,
+                (error, results) => {
                     // console.log(results)
                     connection.release();
                     if (error) {
                         res.send(
-                            JSON.stringify({message: error})
+                            JSON.stringify({message: error, newQA: QATemp})
                         )
                     } else {
                         res.send(
-                            JSON.stringify({message: "success"})
+                            JSON.stringify({message: "success", newQA: results[1][0]})
                         )
                     }
                 });
         }
     });
 })
-
 
 module.exports = router;

@@ -31,7 +31,7 @@ router.get('/checkInRecord/userId=:userId', function(req, res) {
                         )
                     } else {
                         if(results.length === 0){
-                            connection.query(selectCheckInRecord,
+                            connection.query(insertCheckInRecord,
                                 [userId],
                                 (error) => {
                                     if (error) {
@@ -143,7 +143,10 @@ router.get('/round/qAId=:qAId', function(req, res) {
         QAId: -1,
         QARank: -1.00,
         QAType: "",
-        round: 0
+        round: 0,
+        photoOne: "",
+        photoTwo: "",
+        photoThree: "",
     }
 
     pool.getConnection((err, connection) => {
@@ -151,7 +154,7 @@ router.get('/round/qAId=:qAId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT tqa.round, qa.QAId, qa.question, qa.answer, qa.QAType, qa.QARank FROM rememberIt.todayQuestionAnswers tqa INNER JOIN rememberIt.questionAnswers qa ON tqa.QAId = qa.QAId WHERE tqa.QAId = ?;",
+            connection.query("SELECT tqa.round, qa.QAId, qa.question, qa.answer, qa.QAType, qa.QARank, qa.photoOne, qa.photoTwo, qa.photoThree FROM rememberIt.todayQuestionAnswers tqa INNER JOIN rememberIt.questionAnswers qa ON tqa.QAId = qa.QAId WHERE tqa.QAId = ?;",
                 [qAId],
                 (error, results) => {
                     connection.release();
@@ -166,6 +169,7 @@ router.get('/round/qAId=:qAId', function(req, res) {
                             )
                         }else{
                             // console.log(JSON.stringify({message: "success", categories: results}))
+                            // console.log(results[0])
                             res.send(
                                 JSON.stringify({message: "success", QA: results[0]})
                             )

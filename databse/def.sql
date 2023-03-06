@@ -29,6 +29,9 @@ CREATE TABLE questionAnswers
     question     TEXT,
     answer       TEXT,
     QARank       DECIMAL(7, 3),
+    photoOne       TEXT,
+    photoTwo       TEXT,
+    photoThree       TEXT,
     PRIMARY KEY  (QAId),
     FOREIGN KEY  (userId) REFERENCES accounts(userId),
     FOREIGN KEY  (categoryId) REFERENCES categories(categoryId)
@@ -66,6 +69,9 @@ CREATE TABLE productQAs
     QAType      VARCHAR(20),
     question    TEXT,
     answer      TEXT,
+    photoOne       TEXT,
+    photoTwo       TEXT,
+    photoThree       TEXT,
     PRIMARY KEY (productQAId),
     FOREIGN KEY (productId) REFERENCES products(productId)
 );
