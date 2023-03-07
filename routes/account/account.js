@@ -25,7 +25,7 @@ router.post('/login', function(req, res, next) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT * FROM RememberIt.accounts WHERE(email = ? AND password = ?);",
+            connection.query("SELECT * FROM rememberIt.accounts WHERE(email = ? AND password = ?);",
                 [email, password],
                 (error, results) => {
                     connection.release();

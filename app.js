@@ -44,7 +44,7 @@ pool.getConnection((err, connection) => {
     // handle error
     console.error(err);
   } else {
-    connection.query('SELECT * FROM RememberIt.accounts', (error) => {
+    connection.query('SELECT * FROM rememberIt.accounts', (error) => {
       connection.release();
       if (error) {
         // handle error
