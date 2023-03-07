@@ -328,4 +328,103 @@ router.put('', function (req, res){
     });
 })
 
+router.get('/test/categoryId=:categoryId', function(req, res) {
+
+    const { categoryId } = req.params
+
+    const maxQAs = 50
+
+    const QAsTemp = [{
+        question: "",
+        answer: "",
+        QAId: -1,
+        QARank: -1.00,
+        QAType: "",
+        photoOne: "",
+        photoTwo: "",
+        photoThree: ""
+    }]
+
+    const selectRandomLinesQuery = "SELECT * FROM rememberIt.questionAnswers WHERE categoryId = ? ORDER BY RAND() LIMIT ?;"
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            console.error(err);
+        } else {
+            connection.query(selectRandomLinesQuery,
+                [categoryId, maxQAs],
+                (error, results) => {
+                    connection.release()
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error, QAs: QAsTemp})
+                        )
+                    } else {
+                        if(results.length === 0){
+                            res.send(
+                                JSON.stringify({message: "none", QAs: QAsTemp})
+                            )
+                        }else{
+                            // console.log(JSON.stringify({message: "success", categories: results}))
+                            res.send(
+                                JSON.stringify({message: "success", QAs: results})
+                            )
+                        }
+                    }
+                });
+        }
+    });
+});
+
+router.get('/test/userId=:userId', function(req, res) {
+
+    const { userId } = req.params
+
+    const maxQAs = 50
+
+    const QAsTemp = [{
+        question: "",
+        answer: "",
+        QAId: -1,
+        QARank: -1.00,
+        QAType: "",
+        photoOne: "",
+        photoTwo: "",
+        photoThree: ""
+    }]
+
+    const selectRandomLinesQuery = "SELECT * FROM rememberIt.questionAnswers WHERE userId = ? ORDER BY RAND() LIMIT ?;"
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            console.error(err);
+        } else {
+            connection.query(selectRandomLinesQuery,
+                [userId, maxQAs],
+                (error, results) => {
+                    connection.release()
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error, QAs: QAsTemp})
+                        )
+                    } else {
+                        if(results.length === 0){
+                            res.send(
+                                JSON.stringify({message: "none", QAs: QAsTemp})
+                            )
+                        }else{
+                            // console.log(JSON.stringify({message: "success", categories: results}))
+                            res.send(
+                                JSON.stringify({message: "success", QAs: results})
+                            )
+                        }
+                    }
+                });
+        }
+    });
+});
+
+
 module.exports = router;

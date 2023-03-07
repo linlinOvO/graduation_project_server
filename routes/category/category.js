@@ -2,63 +2,6 @@ var express = require('express');
 var router = express.Router();
 const pool = require('../database')
 
-// router.get('/today/userId=:userId', function(req, res) {
-//
-//     const userId = req.params.userId
-//     // console.log(userId)
-//
-//     const categoriesTemp = [{
-//         categoryName: "",
-//         QAs: [{
-//             question: "",
-//             answer: "",
-//             QAType: "",
-//             QAId: -1,
-//             QARank: -1.00
-//         }],
-//         categoryId: -1
-//     }]
-//
-//     pool.getConnection((err, connection) => {
-//         if (err) {
-//             // handle error
-//             console.error(err);
-//         } else {
-//             connection.query("SELECT rememberIt.questionAnswers.*, rememberIt.categories.categoryName \n" +
-//                 "FROM rememberIt.questionAnswers \n" +
-//                 "JOIN rememberIt.categories ON rememberIt.categories.categoryId = rememberIt.questionAnswers.categoryId \n" +
-//                 "WHERE rememberIt.questionAnswers.userId = ? AND QARank < 60\n" +
-//                 "ORDER BY QARank \n" +
-//                 "LIMIT 15;\n",
-//                 [userId],
-//                 (error, results) => {
-//                     connection.release();
-//                     if (error) {
-//                         // handle error
-//                         // console.error(error);
-//                         // console.log(JSON.stringify({message: error, categories: QAsTemp}) )
-//                         res.send(
-//                             JSON.stringify({message: error, categories: categoriesTemp})
-//                         )
-//                     } else {
-//                         if(results.length === 0){
-//                             // console.log(JSON.stringify({message: "No QA for today", categories: QAsTemp}))
-//                             res.send(
-//                                 JSON.stringify({message: "No QA for today", categories: categoriesTemp})
-//                             )
-//                         }else{
-//                             // console.log(JSON.stringify({message: "success", categories: results}))
-//                             res.send(
-//                                 JSON.stringify({message: "success", categories: transformList(results)})
-//                             )
-//                         }
-//                     }
-//                 });
-//         }
-//     });
-// });
-
-
 router.get('/today/userId=:userId', function(req, res) {
 
     const { userId } = req.params

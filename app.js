@@ -55,7 +55,7 @@ pool.getConnection((err, connection) => {
 });
 
 // update QARank every day at 00:00
-function outputOneAtMidnight() {
+function updateAtMidnight() {
   setInterval(() => {
     const now = new Date();
     if (now.getHours() === 0 && now.getMinutes() === 0) {
@@ -79,16 +79,12 @@ function outputOneAtMidnight() {
   }, 60000); // Check every minute
 }
 
-outputOneAtMidnight();
-
-
-
-
-
+updateAtMidnight();
 
 // Serve static files from the "images" directory
 // 第一个是url，第二个是文件夹地址
 app.use('/image', express.static('image'));
+app.use('/audio', express.static('audio'));
 
 // routes
 app.use('/', indexRouter);
