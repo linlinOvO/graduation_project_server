@@ -407,7 +407,7 @@ router.post('/product/download', function (req, res){
 
     const setCategoryId = "SET @newId = LAST_INSERT_ID();"
 
-    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank, photoOne, photoTwo, photoThree) SELECT ?, @newId, QAType, question, answer, 32, photoOne, photoTwo, photoThree FROM rememberIt.productQAs WHERE productId = ?;"
+    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, eF, QAInterval, nextReview, photoOne, photoTwo, photoThree) SELECT ?, @newId, QAType, question, answer, 0, -1, -1, photoOne, photoTwo, photoThree FROM rememberIt.productQAs WHERE productId = ?;"
 
     const selectCategory = "SELECT c.categoryId, c.categoryName, qa.QAId FROM rememberIt.categories c LEFT JOIN rememberIt.questionAnswers qa ON c.categoryId = qa.categoryId AND qa.userId = c.userId WHERE c.categoryId = @newId ORDER BY qa.QAId;"
 

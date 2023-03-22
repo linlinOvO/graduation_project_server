@@ -141,7 +141,6 @@ router.get('/round/qAId=:qAId', function(req, res) {
         question: "",
         answer: "",
         QAId: -1,
-        QARank: -1.00,
         QAType: "",
         round: 0,
         photoOne: "",
@@ -154,7 +153,7 @@ router.get('/round/qAId=:qAId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT tqa.round, qa.QAId, qa.question, qa.answer, qa.QAType, qa.QARank, qa.photoOne, qa.photoTwo, qa.photoThree FROM rememberIt.todayQuestionAnswers tqa INNER JOIN rememberIt.questionAnswers qa ON tqa.QAId = qa.QAId WHERE tqa.QAId = ?;",
+            connection.query("SELECT tqa.round, qa.QAId, qa.question, qa.answer, qa.QAType, qa.photoOne, qa.photoTwo, qa.photoThree FROM rememberIt.todayQuestionAnswers tqa INNER JOIN rememberIt.questionAnswers qa ON tqa.QAId = qa.QAId WHERE tqa.QAId = ?;",
                 [qAId],
                 (error, results) => {
                     connection.release();

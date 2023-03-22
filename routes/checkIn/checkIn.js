@@ -12,8 +12,30 @@ router.get('/calendar/userId=:userId/beginDate=:beginDate/endDate=:endDate', fun
         curMonth: [],
         nextMonth: []
     }
+    let preMonthNum = -1
+    let curMonthNum = -1
+    let nextMonthNum = -1
+
+    if(endDate.split("-")[1] - beginDate.split("-")[1] === 2){
+        preMonthNum = beginDate.split("-")[1] - ''
+        curMonthNum = preMonthNum + 1
+        nextMonthNum = curMonthNum + 1
+    }else if(endDate.split("-")[1] - beginDate.split("-")[1] === -10){
+        preMonthNum = 11
+        curMonthNum = 12
+        nextMonthNum = 1
+    }else if(endDate.split("-")[1] - beginDate.split("-")[1] === 1){
+        preMonthNum = 0
+        curMonthNum = beginDate.split("-")[1] - ''
+        nextMonthNum = curMonthNum + 1
+    }else{
+        preMonthNum = 0
+        curMonthNum = 12
+        nextMonthNum = 1
+    }
 
     function formatCheckInDate(dates) {
+
         let preMonth = [];
         let curMonth = [];
         let nextMonth = [];
@@ -25,13 +47,13 @@ router.get('/calendar/userId=:userId/beginDate=:beginDate/endDate=:endDate', fun
             let formattedDate = `2023-${month}-${day}`;
 
             switch (month) {
-                case 1:
+                case preMonthNum:
                     preMonth.push(formattedDate);
                     break;
-                case 2:
+                case curMonthNum:
                     curMonth.push(formattedDate);
                     break;
-                case 3:
+                case nextMonthNum:
                     nextMonth.push(formattedDate);
                     break;
             }
@@ -43,7 +65,6 @@ router.get('/calendar/userId=:userId/beginDate=:beginDate/endDate=:endDate', fun
             nextMonth
         };
     }
-
 
     pool.getConnection((err, connection) => {
         if (err) {

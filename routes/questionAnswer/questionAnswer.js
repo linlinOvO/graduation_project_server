@@ -1,5 +1,5 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const pool = require('../database')
 const fs = require("fs");
 //
@@ -62,7 +62,6 @@ router.get('/qAId=:qAId', function(req, res) {
         question: "",
         answer: "",
         QAId: -1,
-        QARank: -1.00,
         QAType: "",
         photoOne: "",
         photoTwo: "",
@@ -74,7 +73,7 @@ router.get('/qAId=:qAId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT question, answer, QAId, QAType, QARank, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE QAId = ?;",
+            connection.query("SELECT question, answer, QAId, QAType, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE QAId = ?;",
                 [qAId],
                 (error, results) => {
                     connection.release();
@@ -108,7 +107,6 @@ router.get('/categoryId=:categoryId', function(req, res) {
         question: "",
         answer: "",
         QAId: -1,
-        QARank: -1.00,
         QAType: "",
         photoOne: "",
         photoTwo: "",
@@ -120,7 +118,7 @@ router.get('/categoryId=:categoryId', function(req, res) {
             // handle error
             console.error(err);
         } else {
-            connection.query("SELECT question, answer, QAId, QAType, QARank, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE categoryId = ?;",
+            connection.query("SELECT question, answer, QAId, QAType, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE categoryId = ?;",
                 [categoryId],
                 (error, results) => {
                     connection.release();
@@ -151,7 +149,6 @@ router.post('', function (req, res){
         question: "",
         answer: "",
         QAId: -1,
-        QARank: -1.00,
         QAType: "",
         photoOne: "",
         photoTwo: "",
@@ -160,9 +157,9 @@ router.post('', function (req, res){
 
     const { userId, categoryId, QAType, question, answer, photoOne, photoTwo, photoThree } = req.body
 
-    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, QARank, photoOne, photoTwo, photoThree)VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);"
+    const insertQA = "INSERT INTO rememberIt.questionAnswers (userId, categoryId, QAType, question, answer, eF, QAInterval, nextReview, photoOne, photoTwo, photoThree)VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
 
-    const selectQA = "SELECT question, answer, QAId, QAType, QARank, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? ORDER BY QAId DESC LIMIT 1;"
+    const selectQA = "SELECT question, answer, QAId, QAType, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE userId = ? AND categoryId = ? ORDER BY QAId DESC LIMIT 1;"
 
     const insertLocal = "INSERT INTO rememberIt.todayQuestionAnswers (QAId, userId, categoryName, categoryId, round) SELECT QAId, qa.userId, categoryName, qa.categoryId, 1 FROM rememberIt.questionAnswers qa, rememberIt.categories c WHERE qa.userId = ? AND qa.categoryId = ? AND c.categoryId = qa.categoryId ORDER BY QAId DESC LIMIT 1;"
 
@@ -172,7 +169,7 @@ router.post('', function (req, res){
             console.error(err);
         } else {
             connection.query(insertQA + selectQA + insertLocal,
-                [userId, categoryId, QAType, question, answer, 32, photoOne, photoTwo, photoThree, userId, categoryId, userId, categoryId],
+                [userId, categoryId, QAType, question, answer, 0, -1, -1, photoOne, photoTwo, photoThree, userId, categoryId, userId, categoryId],
                 (error, results) => {
                     // console.log(results)
                     connection.release();
@@ -251,9 +248,78 @@ router.delete('/today/QAId=:QAId', function (req, res){
     });
 })
 
+router.put('/interval', function (req, res) {
+    const {QAId, choice} = req.body
+
+    let eF = -1
+
+    const selectEF = "SELECT eF FROM rememberIt.questionAnswers WHERE QAId = ?;"
+    let updateInterval = ""
+
+    pool.getConnection((err, connection) => {
+        if (err) {
+            // handle error
+            console.error(err);
+        } else {
+            connection.query(selectEF,
+                [QAId],
+                (error, results) => {
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error})
+                        )
+                        return
+                    } else {
+                        eF = results[0].eF
+                    }
+                });
+            if(choice === "rememberWell"){
+                updateInterval = "UPDATE rememberIt.questionAnswers SET nextReview = 10000 WHERE QAId = ?;"
+            }else if(choice === "remember"){
+                if(eF === 0){
+                    updateInterval = "UPDATE rememberIt.questionAnswers SET eF = 2.2, QAInterval = 2, nextReview = QAInterval WHERE QAId = ?;"
+                }else if(eF >= 2.5){
+                    updateInterval = "UPDATE rememberIt.questionAnswers SET QAInterval = QAInterval * eF, nextReview = QAInterval WHERE QAId = ?;"
+                }else{
+                    updateInterval = "UPDATE rememberIt.questionAnswers SET eF = eF + 0.15, QAInterval = QAInterval * eF, nextReview = QAInterval WHERE QAId = ?;"
+                }
+            }else if(choice === "familiar"){
+                if(eF === 0){
+                    updateInterval = "UPDATE rememberIt.questionAnswers SET eF = 1.9, QAInterval = 1, nextReview = QAInterval WHERE QAId = ?;"
+                }else{
+                    updateInterval = "UPDATE rememberIt.questionAnswers SET QAInterval = 1, nextReview = QAInterval WHERE QAId = ?;"
+                }
+            }else{
+                if(eF === 0){
+                    updateInterval = "UPDATE rememberIt.questionAnswers SET eF = 1.6, QAInterval = 1, nextReview = QAInterval WHERE QAId = ?;"
+                }else if(eF <= 1.3){
+                    updateInterval = "UPDATE rememberIt.questionAnswers SET QAInterval = QAInterval * eF, nextReview = QAInterval WHERE QAId = ?;"
+                }else{
+                    updateInterval = "UPDATE rememberIt.questionAnswers SET eF = eF - 0.15, QAInterval = 1, nextReview = QAInterval WHERE QAId = ?;"
+                }
+            }
+
+            connection.query(updateInterval,
+                [QAId],
+                (error) => {
+                    if (error) {
+                        res.send(
+                            JSON.stringify({message: error})
+                        )
+
+                    } else {
+                        res.send(
+                            JSON.stringify({message: "success"})
+                        )
+                    }
+                });
+        }
+    });
+})
+
 router.put('', function (req, res){
 
-    const { QAId, question, answer, QARank, photoOne, photoTwo, photoThree } = req.body
+    const { QAId, question, answer, eF, QAInterval, nextReview, photoOne, photoTwo, photoThree } = req.body
     // console.log(userId, checkInDate)
 
 
@@ -269,9 +335,17 @@ router.put('', function (req, res){
         parts.push("answer = ?")
         params.push(answer)
     }
-    if(QARank !== ""){
-        parts.push("QARank = ?")
-        params.push(QARank)
+    if(eF !== -1){
+        parts.push("eF = ?")
+        params.push(eF)
+    }
+    if(QAInterval !== -1){
+        parts.push("QAInterval = ?")
+        params.push(QAInterval)
+    }
+    if(nextReview !== -1){
+        parts.push("nextReview = ?")
+        params.push(nextReview)
     }
     if(photoOne !== ""){
         parts.push("photoOne = ?")
@@ -289,7 +363,7 @@ router.put('', function (req, res){
     SqlSentence += parts.join(", ") + " WHERE QAId = ?;"
     params.push(QAId)
 
-    const selectQA = "SELECT question, answer, QAId, QAType, QARank, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE QAId = ?"
+    const selectQA = "SELECT question, answer, QAId, QAType, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE QAId = ?"
 
     params.push(QAId)
 
@@ -297,7 +371,6 @@ router.put('', function (req, res){
         question: "",
         answer: "",
         QAId: -1,
-        QARank: -1.00,
         QAType: "",
         photoOne: "",
         photoTwo: "",
@@ -338,14 +411,13 @@ router.get('/test/categoryId=:categoryId', function(req, res) {
         question: "",
         answer: "",
         QAId: -1,
-        QARank: -1.00,
         QAType: "",
         photoOne: "",
         photoTwo: "",
         photoThree: ""
     }]
 
-    const selectRandomLinesQuery = "SELECT * FROM rememberIt.questionAnswers WHERE categoryId = ? ORDER BY RAND() LIMIT ?;"
+    const selectRandomLinesQuery = "SELECT question, answer, QAId, QAType, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE categoryId = ? ORDER BY RAND() LIMIT ?;"
 
     pool.getConnection((err, connection) => {
         if (err) {
@@ -366,7 +438,6 @@ router.get('/test/categoryId=:categoryId', function(req, res) {
                                 JSON.stringify({message: "none", QAs: QAsTemp})
                             )
                         }else{
-                            // console.log(JSON.stringify({message: "success", categories: results}))
                             res.send(
                                 JSON.stringify({message: "success", QAs: results})
                             )
@@ -381,20 +452,19 @@ router.get('/test/userId=:userId', function(req, res) {
 
     const { userId } = req.params
 
-    const maxQAs = 50
+    const maxQAs = 100
 
     const QAsTemp = [{
         question: "",
         answer: "",
         QAId: -1,
-        QARank: -1.00,
         QAType: "",
         photoOne: "",
         photoTwo: "",
         photoThree: ""
     }]
 
-    const selectRandomLinesQuery = "SELECT * FROM rememberIt.questionAnswers WHERE userId = ? ORDER BY RAND() LIMIT ?;"
+    const selectRandomLinesQuery = "SELECT question, answer, QAId, QAType, photoOne, photoTwo, photoThree FROM rememberIt.questionAnswers WHERE userId = ? ORDER BY RAND() LIMIT ?;"
 
     pool.getConnection((err, connection) => {
         if (err) {

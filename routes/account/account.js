@@ -174,30 +174,7 @@ router.put('', function (req, res){
 
 router.get('/verify/email=:email', function (req, res) {
     const { email } = req.params;
-
-    // pool.getConnection((err, connection) => {
-    //     if (err) {
-    //         // handle error
-    //         console.error(err);
-    //     } else {
-    //         connection.query("SELECT * FROM rememberIt.accounts WHERE email = ?",
-    //             [email],
-    //             (error, result) => {
-    //                 // console.log(results)
-    //                 connection.release();
-    //                 if (error) {
-    //                     res.send(
-    //                         JSON.stringify({message: error})
-    //                     )
-    //                 }
-    //                 if(result.length > 0){
-    //                     res.send(
-    //                         JSON.stringify({message: "The email has already been used"})
-    //                     )
-    //                 }
-    //             });
-    //     }
-    // });
+    // console.log(email)
 
     const code = Math.floor(100000 + Math.random() * 900000); // generate 6-digit code
     const transporter = nodemailer.createTransport({
@@ -228,6 +205,7 @@ The Remember It Team`
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
+        console.log("sending")
         if (error) {
             console.log(error);
             res.status(500).send(JSON.stringify({message: 'Error sending verification code.'}));
