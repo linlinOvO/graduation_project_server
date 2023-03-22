@@ -122,8 +122,17 @@ router.get('/calendar/userId=:userId/checkInDate=:checkInDate', function(req, re
                             JSON.stringify({message: error, record: studyRecordTemp})
                         )
                     } else {
+                        const result = results[0]
+                        // console.log(result)
+                        const temp = {
+                            rememberWell: result.rememberWell.split(" ").length - 1,
+                            remember: result.remember.split(" ").length - 1,
+                            familiar: result.familiar.split(" ").length - 1,
+                            forgot: result.forgot.split(" ").length - 1,
+                        }
+                        // console.log(temp)
                         res.send(
-                            JSON.stringify({message: "success", record: results[0]})
+                            JSON.stringify({message: "success", record: temp})
                         )
                     }
                 });
@@ -134,6 +143,7 @@ router.get('/calendar/userId=:userId/checkInDate=:checkInDate', function(req, re
 router.post('/calendar', function(req, res) {
 
     const {userId, checkInDate, rememberWell, remember, familiar, forgot} = req.body
+    // console.log(userId, checkInDate, rememberWell, remember, familiar, forgot)
     //
     //memberWell, remember, familiar, forgot)
 

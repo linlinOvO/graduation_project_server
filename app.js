@@ -66,7 +66,19 @@ function updateAtMidnight() {
         } else {
           const updateInterval = 'UPDATE rememberIt.questionAnswers SET nextReview = nextReview - 1 WHERE nextReview < 10000;'
           const deleteTodayQAs = 'DELETE FROM rememberIt.todayQuestionAnswers;'
-          connection.query(updateInterval + deleteTodayQAs, (error) => {
+          const updateMemoryRecord = "INSERT INTO rememberIt.memoryRecord (userId, checkInDate, rememberWell, remember, familiar, forgot)" +
+              "SELECT \n" +
+              "    userId,\n" +
+              "    NOW(),\n" +
+              "    (SELECT GROUP_CONCAT(categoryId SEPARATOR ' ') FROM rememberIt.questionAnswers WHERE userId = accounts.userId AND QAInterval > 90) as rememberWell,\n" +
+              "    (SELECT GROUP_CONCAT(categoryId SEPARATOR ' ') FROM rememberIt.questionAnswers WHERE userId = accounts.userId AND QAInterval > 60 AND QAInterval <= 90) as remember,\n" +
+              "    (SELECT GROUP_CONCAT(categoryId SEPARATOR ' ') FROM rememberIt.questionAnswers WHERE userId = accounts.userId AND QAInterval > 30 AND QAInterval <= 60) as familiar,\n" +
+              "    (SELECT GROUP_CONCAT(categoryId SEPARATOR ' ') FROM rememberIt.questionAnswers WHERE userId = accounts.userId AND QAInterval < 30) as forgot\n" +
+              "FROM \n" +
+              "    rememberIt.accounts;\n"
+          //SELECT GROUP_CONCAT(categoryId SEPARATOR ' ') FROM rememberIt.questionAnswers WHERE userId = 1 AND QAInterval < 30;
+
+          connection.query(updateInterval + deleteTodayQAs + updateMemoryRecord, (error) => {
             connection.release();
             if (error) {
               // handle error

@@ -57,18 +57,20 @@ router.get('/checkInRecord/userId=:userId', function(req, res) {
 
 router.put('/todayMemoryRecord', function(req, res) {
 
-    const { userId, checkInDate, choice } = req.body
+    const { userId, checkInDate, choice, categoryId } = req.body
 
-    let updateMemoryRecord = "UPDATE rememberIt.todayQADate SET forgot = forgot + 1 WHERE userId = ? AND todayQADate = ?;";
+    // console.log(userId, checkInDate, choice, categoryId)
+
+    let updateMemoryRecord = "UPDATE rememberIt.todayQADate SET forgot = CONCAT(forgot, ?) WHERE userId = ? AND todayQADate = ?;"
     switch (choice) {
         case "rememberWell":
-            updateMemoryRecord = "UPDATE rememberIt.todayQADate SET rememberWell = rememberWell + 1 WHERE userId = ? AND todayQADate = ?;";
+            updateMemoryRecord = "UPDATE rememberIt.todayQADate SET rememberWell = CONCAT(rememberWell, ?) WHERE userId = ? AND todayQADate = ?;";
             break;
         case "remember":
-            updateMemoryRecord = "UPDATE rememberIt.todayQADate SET remember = remember + 1 WHERE userId = ? AND todayQADate = ?;";
+            updateMemoryRecord = "UPDATE rememberIt.todayQADate SET remember = CONCAT(remember, ?) WHERE userId = ? AND todayQADate = ?;";
             break;
         case "familiar":
-            updateMemoryRecord = "UPDATE rememberIt.todayQADate SET familiar = familiar + 1 WHERE userId = ? AND todayQADate = ?;";
+            updateMemoryRecord = "UPDATE rememberIt.todayQADate SET familiar = CONCAT(familiar, ?) WHERE userId = ? AND todayQADate = ?;";
             break;
     }
 
@@ -78,7 +80,7 @@ router.put('/todayMemoryRecord', function(req, res) {
             console.error(err);
         } else {
             connection.query(updateMemoryRecord,
-                [userId, checkInDate],
+                [categoryId + " ", userId, checkInDate],
                 (error, results) => {
                     // console.log(results)
                     connection.release();
@@ -101,10 +103,11 @@ router.get('/todayMemoryRecord/userId=:userId/checkInDate=:checkInDate', functio
     const { userId, checkInDate } = req.params
 
     const todayMemoryRecordTemp = {
-        rememberWell: 0,
-        remember: 0,
-        familiar: 0,
-        forgot: 0
+        message: "",
+        rememberWell: "",
+        remember: "",
+        familiar: "",
+        forgot: ""
     }
 
     pool.getConnection((err, connection) => {
@@ -119,12 +122,20 @@ router.get('/todayMemoryRecord/userId=:userId/checkInDate=:checkInDate', functio
                     connection.release();
                     if (error) {
                         res.send(
-                            JSON.stringify({message: error.toString(), record: todayMemoryRecordTemp})
+                            JSON.stringify(todayMemoryRecordTemp)
                         )
                     } else {
                         // console.log(results)
+                        const result = results[0]
+                        const temp = {
+                            message: "success",
+                            rememberWell: result.rememberWell,
+                            remember: result.remember,
+                            familiar: result.familiar,
+                            forgot: result.forgot
+                        }
                         res.send(
-                            JSON.stringify({message: "success", record: results[0]})
+                            JSON.stringify(temp)
                         )
                     }
                 });
@@ -167,8 +178,6 @@ router.get('/round/qAId=:qAId', function(req, res) {
                                 JSON.stringify({message: "can not find QA", QA: QATemp})
                             )
                         }else{
-                            // console.log(JSON.stringify({message: "success", categories: results}))
-                            // console.log(results[0])
                             res.send(
                                 JSON.stringify({message: "success", QA: results[0]})
                             )

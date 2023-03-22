@@ -23,9 +23,9 @@ router.get('/today/userId=:userId', function(req, res) {
             // select the row with the specified user ID from todayQADate table
             const selectTodayQADate = `SELECT * FROM rememberIt.todayQADate WHERE userId = ?;`;
             // insert a new row with the specified user ID and formatted date
-            const insertTodayQADate = `INSERT INTO rememberIt.todayQADate (userId, todayQADate, rememberWell, remember, familiar, forgot) VALUES (?, NOW(), 0, 0, 0, 0);`;
+            const insertTodayQADate = `INSERT INTO rememberIt.todayQADate (userId, todayQADate, rememberWell, remember, familiar, forgot) VALUES (?, NOW(), "", "", "", "");`;
             // update a new row with the specified user ID and formatted date
-            const updateTodayQADate = `UPDATE rememberIt.todayQADate SET todayQADate = NOW() WHERE userId = ?;`;
+            const updateTodayQADate = `UPDATE rememberIt.todayQADate SET todayQADate = NOW() WHERE userId = ?;`
             // select specific rows from questionAnswer table
             const selectQuestionAnswers = "SELECT qA.QAId, c.categoryName, c.categoryId FROM rememberIt.questionAnswers qA JOIN rememberIt.categories c ON c.categoryId = qA.categoryId WHERE qA.userId = ? AND nextReview <= 0 ORDER BY nextReview;";
             // select all rows from todayQuestionAnswers table

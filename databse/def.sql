@@ -43,10 +43,10 @@ CREATE TABLE checkIns
 (
     userId       INT NOT NULL,
     checkInDate  DATE NOT NULL,
-    rememberWell INT,
-    remember     INT,
-    familiar     INT,
-    forgot       INT,
+    rememberWell TEXT,
+    remember     TEXT,
+    familiar     TEXT,
+    forgot       TEXT,
     FOREIGN KEY  (userId) REFERENCES accounts(userId)
 );
 
@@ -101,10 +101,10 @@ CREATE TABLE memoryRecord
 (
     userId       INT NOT NULL,
     checkInDate  DATE NOT NULL,
-    rememberWell INT,
-    remember     INT,
-    familiar     INT,
-    forgot       INT,
+    rememberWell TEXT,
+    remember     TEXT,
+    familiar     TEXT,
+    forgot       TEXT,
     FOREIGN KEY  (userId) REFERENCES accounts(userId)
 );
 
@@ -133,10 +133,10 @@ CREATE TABLE todayQADate
 (
     userId       INT NOT NULL,
     todayQADate  DATE NOT NULL,
-    rememberWell INT NOT NULL,
-    remember INT NOT NULL,
-    familiar INT NOT NULL,
-    forgot INT NOT NULL,
+    rememberWell TEXT NOT NULL,
+    remember     TEXT NOT NULL,
+    familiar     TEXT NOT NULL,
+    forgot       TEXT NOT NULL,
     FOREIGN KEY  (userId) REFERENCES accounts(userId)
 );
 
