@@ -8,6 +8,7 @@ const pool = createPool({
     password: "password",
     connectionLimit: 10,
     multipleStatements: true,
+    timezone: "-0:00"
 });
 
 module.exports = pool

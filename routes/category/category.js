@@ -64,9 +64,14 @@ router.get('/today/userId=:userId', function(req, res) {
                     });
                 } else {
                     // if a row was found, check if the todayQADate value matches the formatted date string
+                    // console.log(results[0].todayQADate)
+                    // console.log(results[0].todayQADate.toISOString())
+                    // console.log(results[0].todayQADate.toISOString().slice(0, 10))
+                    // console.log(today)
                     if (results[0].todayQADate.toISOString().slice(0, 10) === today) {
-                        console.log("i am here")
+                        // console.log("i am here")
                         connection.query(selectTodayQuestionAnswers, [userId], (error, results) => {
+                            // console.log(results)
                             if (error) {
                                 res.send(
                                     JSON.stringify({message: error, categories: categoriesTemp})
@@ -88,6 +93,7 @@ router.get('/today/userId=:userId', function(req, res) {
                     } else {
                         connection.query(selectQuestionAnswers + updateTodayQADate + insertTodayQuestionAnswers,
                             [userId, userId, userId, userId], (error, results) => {
+                            // console.log(results)
                             if (error) {
                                 res.send(
                                     JSON.stringify({message: error, categories: categoriesTemp})

@@ -452,7 +452,7 @@ router.get('/test/userId=:userId', function(req, res) {
 
     const { userId } = req.params
 
-    const maxQAs = 100
+    const maxQAs = 50
 
     const QAsTemp = [{
         question: "",

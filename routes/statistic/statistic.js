@@ -186,7 +186,7 @@ router.get('/memoryRecord/userId=:userId/categoryId=:categoryId', function(req, 
             }else{
                 const myList = item.rememberWell.split(" ")
 
-                if(categoryId !== -1){
+                if(categoryId !== "-1"){
                     let count = 0;
                     for(let i = 0; i < myList.length; i++){
                         if(myList[i] === categoryId + ""){
@@ -204,7 +204,7 @@ router.get('/memoryRecord/userId=:userId/categoryId=:categoryId', function(req, 
             }else{
                 const myList = item.remember.split(" ")
 
-                if(categoryId !== -1){
+                if(categoryId !== "-1"){
                     let count = 0;
                     for(let i = 0; i < myList.length; i++){
                         if(myList[i] === categoryId + ""){
@@ -222,7 +222,7 @@ router.get('/memoryRecord/userId=:userId/categoryId=:categoryId', function(req, 
             }else{
                 const myList = item.familiar.split(" ")
 
-                if(categoryId !== -1){
+                if(categoryId !== "-1"){
                     let count = 0;
                     for(let i = 0; i < myList.length; i++){
                         if(myList[i] === categoryId + ""){
@@ -240,7 +240,7 @@ router.get('/memoryRecord/userId=:userId/categoryId=:categoryId', function(req, 
             }else{
                 const myList = item.forgot.split(" ")
 
-                if(categoryId !== -1){
+                if(categoryId !== "-1"){
                     let count = 0;
                     for(let i = 0; i < myList.length; i++){
                         if(myList[i] === categoryId + ""){
